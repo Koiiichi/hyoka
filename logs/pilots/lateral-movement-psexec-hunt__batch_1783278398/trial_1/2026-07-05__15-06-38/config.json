@@ -1,0 +1,16 @@
+{
+    "job_name": "2026-07-05__15-06-38",
+    "jobs_dir": "jobs/batch_1783278398/trial_1",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/lateral-movement-psexec-hunt"
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/threat-hunt-windows-eventlogs"
+    },
+    "trial_name": "threat-hunt-windows-eventlogs__95XRmza",
+    "trials_dir": "jobs/batch_1783275758/trial_4/2026-07-05__14-22-38",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "7857e08c-e078-4d5d-9ef0-4bed27ea1ca5"
+}

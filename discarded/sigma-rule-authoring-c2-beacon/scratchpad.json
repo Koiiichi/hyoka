@@ -1,0 +1,11 @@
+{
+  "task_path": "samples/sigma-rule-authoring-c2-beacon",
+  "cycle": 0,
+  "oracle_score": null,
+  "nop_score": null,
+  "trials": [],
+  "pass_threshold": 0.3,
+  "tightening_actions": [],
+  "exit_condition_met": false,
+  "failure_reason": null
+}

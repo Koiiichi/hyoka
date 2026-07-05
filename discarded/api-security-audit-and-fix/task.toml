@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "abundant-cyber-eval/api-security-audit-and-fix"
+description = "Audit a runnable Flask API service that contains multiple distinct vulnerabilities (broken object-level authorization, mass-assignment privilege escalation, and server-side template injection) and fix them all so an executed security test suite passes without regressing an executed functional suite. Execution-based, binary reward."
+authors = [{ name = "Muneeb Hassan", email = "m57hassa@uwaterloo.ca" }]
+keywords = ["cybersecurity", "appsec", "vulnerability-repair", "security-audit", "idor", "mass-assignment", "ssti", "execution-based"]
+
+[metadata]
+difficulty_explanation = "Lever-B execution-based task, adapted from the CVE-Bench / VulnRepairEval pattern (arXiv 2503.17332 SOTA ~13%; arXiv 2509.03331 top model ~21.7%) with multiplicative difficulty and NO ambiguous scoring axis. The agent must find and fix THREE distinct, non-canonical vulnerabilities of different classes (IDOR / broken object-level authorization, mass-assignment privilege escalation, and SSTI) in one runnable service, then a hidden suite RUNS each exploit and each functional case. Reward is 1 only if all pass. Difficulty is multiplicative and objective: a partial audit that fixes some vulnerabilities fails the security suite, and an over-aggressive lockdown fails the functional suite. Unlike a MITRE-label axis, an executed exploit test cannot be 'defensibly wrong', so there is no ambiguity artifact. The vulnerabilities require understanding the service's own logic rather than applying a single memorized one-liner."
+category = "vulnerability-repair"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/discovery-account-enum-hunt"
+    },
+    "trial_name": "discovery-account-enum-hunt__moRPf93",
+    "trials_dir": "jobs/batch_1783279150/trial_4/2026-07-05__15-19-10",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "a6fe1fc9-f402-4f46-9645-d6701200933e"
+}

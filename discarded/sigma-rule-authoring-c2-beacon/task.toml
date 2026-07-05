@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "abundant-cyber-eval/sigma-rule-authoring-c2-beacon"
+description = "Study a week of HTTP proxy logs and an imprecise analyst note, fingerprint a periodic C2 beacon, and author a Sigma rule that detects it without firing on benign CDN and User-Agent look-alikes. Scored on F1 against a held-out labeled corpus."
+authors = [{ name = "Muneeb Hassan", email = "m57hassa@uwaterloo.ca" }]
+keywords = ["cybersecurity", "soc", "detection-engineering", "sigma", "c2-beacon", "proxy-logs", "mitre-attack"]
+
+[metadata]
+difficulty_explanation = "Fractional (F1) verifier, rebuilt to inherit CTI-REALM's generalization mechanic (arXiv 2603.13517). The agent authors a Sigma rule against one network's ~2,600-row proxy log but is graded on a HIDDEN held-out capture from a different network with different C2 domains, beacon variants, and benign look-alikes. Two hard negatives each share exactly one behavioral field with the beacon (a monitoring agent reuses its User-Agent on normal URIs; an analytics service reuses its /<hex>/<token> URI structure), so any single-field rule drops precision below 1.0, and any domain- or literal-anchored rule drops recall to ~0 on the variants. Only the behavioral intersection (URI structure AND the beacon User-Agent token), expressed domain-agnostically, reaches F1=1.0. Reward is the fractional held-out F1; a pass requires perfect generalization. Hard in the overall eval's spread."
+category = "detection-engineering"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

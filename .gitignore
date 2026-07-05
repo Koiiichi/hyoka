@@ -1,5 +1,5 @@
 # ==========================================
-# Hyoka Project - .gitignore
+# hyōka — .gitignore
 # ==========================================
 
 # --- OS Artifacts ---
@@ -15,17 +15,11 @@ __pycache__/
 .coverage
 htmlcov/
 
-# --- Environments & Dependencies ---
+# --- Environments & Secrets ---
 .venv/
 venv/
 ENV/
 env/
-poetry.lock
-pdm.lock
-.pdm-plugins/
-
-# --- Secrets & Environment Variables ---
-# Absolutely critical to prevent leaking your Gemini API keys
 .env
 .env.local
 .env.*
@@ -33,29 +27,24 @@ pdm.lock
 *.key
 credentials.json
 
-# --- IDEs & Editors ---
+# --- IDEs ---
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
 
-# --- Harbor & Runtime Outputs ---
-# Harbor dumps raw trial runs into a local 'jobs/' folder by default.
-# These trajectories, container logs, and metadata files can become massive.
-# Keep this ignored, and manage your final curated 'logs/' folder separately.
+# --- Harbor raw job output (large; curated pilots kept in logs/) ---
+archive/
 jobs/
 
-# --- Local Testing Artifacts ---
-# Ignore temporary log generations from local debugging outside Harbor
-samples/**/environment/data/generated_logs/
-
-# --- Local .md files ---
-AGENT_DELEGATION.md
-ROADMAP.md
-SETUP_GUIDE.md
+# --- Agent-internal guidance files (not for public consumption) ---
+assets/BRAND.md
+docs/AGENT_DELEGATION.md
+docs/SETUP_GUIDE.md
 report/OUTLINE.md
 
-# --- Reference .pdf files ---
-Task_ref.pdf
+# --- Reference PDFs (copyright; not redistributable) ---
+docs/Task_ref.pdf
+docs/reference-reports/
+
+# --- Temporary local test artifacts ---
+samples/**/environment/data/generated_logs/
+/tmp/

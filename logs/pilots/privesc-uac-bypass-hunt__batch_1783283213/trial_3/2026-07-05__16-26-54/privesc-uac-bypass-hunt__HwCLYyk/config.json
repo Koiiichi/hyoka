@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/privesc-uac-bypass-hunt"
+    },
+    "trial_name": "privesc-uac-bypass-hunt__HwCLYyk",
+    "trials_dir": "jobs/batch_1783283213/trial_3/2026-07-05__16-26-54",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "bea3a90a-53d3-484a-96e6-fd4fbbc12afc"
+}

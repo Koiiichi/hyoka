@@ -1,0 +1,8 @@
+task_name,n_trials,n_pass,pass@1,pass@3,clears_bar_lt_30pct
+abundant-cyber-eval/defense-evasion-injection-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/discovery-account-enum-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/execution-vbs-launcher-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/lateral-movement-psexec-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/persistence-run-key-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/privesc-uac-bypass-hunt,5,0,0.0,0.0,True
+abundant-cyber-eval/threat-hunt-windows-eventlogs,5,0,0.0,0.0,True

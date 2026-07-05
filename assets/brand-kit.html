@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hyoka — brand kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0A0A0A;
+    --paper: #FFFFFF;
+    --gray: #666666;
+    --line: #EAEAEA;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 64px 48px 120px;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .hero { display: flex; align-items: center; gap: 20px; margin-bottom: 64px; }
+  .hero svg { width: 56px; height: 56px; }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 52px;
+    letter-spacing: -1.5px;
+    margin: 0;
+    line-height: 1;
+  }
+  section { margin-bottom: 56px; }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+  }
+  .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .swatch { border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .swatch .fill { height: 64px; }
+  .swatch .label { padding: 10px 12px; font-size: 12px; }
+  .swatch .label b { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 13px; margin-bottom: 2px; }
+  .type-row { display: flex; align-items: baseline; gap: 20px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .type-row:last-child { border-bottom: none; }
+  .type-role { width: 160px; flex-shrink: 0; font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+  .type-sample-display { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 32px; }
+  .type-sample-mono { font-family: 'IBM Plex Mono', monospace; font-size: 18px; }
+  .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .usage-card { border-radius: 8px; padding: 40px; display: flex; align-items: center; justify-content: center; }
+  .usage-card svg { width: 64px; height: 64px; }
+  .note { font-size: 13px; color: var(--gray); line-height: 1.7; max-width: 560px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg viewBox="0 0 200 200"><polygon points="142.4,57.6 25.8,96.5 103.5,174.2" fill="#0A0A0A"/></svg>
+    <h1>hyoka</h1>
+  </div>
+
+  <section>
+    <h2>Palette</h2>
+    <div class="swatches">
+      <div class="swatch"><div class="fill" style="background:var(--ink)"></div><div class="label"><b>Ink</b>#0A0A0A</div></div>
+      <div class="swatch"><div class="fill" style="background:var(--paper); border-bottom:1px solid var(--line)"></div><div class="label"><b>Paper</b>#FFFFFF</div></div>
+      <div class="swatch"><div class="fill" style="background:var(--gray)"></div><div class="label"><b>Gray</b>#666666</div></div>
+    </div>
+    <p class="note">Three colors, no exceptions. Ink and paper carry everything; gray is for secondary/muted text only. No accent color — contrast and spacing do the work instead.</p>
+  </section>
+
+  <section>
+    <h2>Type</h2>
+    <div class="type-row">
+      <div class="type-role">Display<br>Space Grotesk</div>
+      <div class="type-sample-display">hyoka</div>
+    </div>
+    <div class="type-row">
+      <div class="type-role">Data / utility<br>IBM Plex Mono</div>
+      <div class="type-sample-mono">pass@3 = 0.13</div>
+    </div>
+    <p class="note">Space Grotesk for the wordmark and headers only. IBM Plex Mono for anything that's actually data — metrics, log lines, code, task names. No third face, no italic accent.</p>
+  </section>
+
+  <section>
+    <h2>Mark usage</h2>
+    <div class="usage-grid">
+      <div class="usage-card" style="background:var(--ink)">
+        <svg viewBox="0 0 200 200"><polygon points="142.4,57.6 25.8,96.5 103.5,174.2" fill="#FAFAFA"/></svg>
+      </div>
+      <div class="usage-card" style="background:var(--paper); border:1px solid var(--line)">
+        <svg viewBox="0 0 200 200"><polygon points="142.4,57.6 25.8,96.5 103.5,174.2" fill="#0A0A0A"/></svg>
+      </div>
+    </div>
+    <p class="note">One shape, two fills. Never recolor it, never add a second element next to it. If it needs a companion mark for a different context, that's a new mark — not a variant of this one.</p>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+    "jobs_dir": "jobs/batch_1783283213/trial_4",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/privesc-uac-bypass-hunt"
+        }
+    ]
+}

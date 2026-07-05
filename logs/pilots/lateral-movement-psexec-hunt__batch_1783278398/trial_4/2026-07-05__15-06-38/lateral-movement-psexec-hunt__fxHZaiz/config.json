@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/lateral-movement-psexec-hunt"
+    },
+    "trial_name": "lateral-movement-psexec-hunt__fxHZaiz",
+    "trials_dir": "jobs/batch_1783278398/trial_4/2026-07-05__15-06-38",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "79bd66e8-4cb4-4686-b502-0992b99f1506"
+}

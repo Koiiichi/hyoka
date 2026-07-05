@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "abundant-cyber-eval/persistence-run-key-hunt"
+description = "Threat-hunt a SQLite database of real Windows Sysmon + Security logs (a real Empire Run-key persistence recording from OTRF Security-Datasets, deterministically time-shifted and entity-obfuscated) with no hints, and flag the malicious process's persistence and C2 activity. Scored by F1 against Sigma/behaviour-derived ground truth."
+authors = [{ name = "Muneeb Hassan", email = "m57hassa@uwaterloo.ca" }]
+keywords = ["cybersecurity", "soc", "threat-hunting", "persistence", "registry-run-keys", "sysmon", "mitre-attack"]
+
+[metadata]
+difficulty_explanation = "Confirmed OTRF template (arXiv 2604.19533). Source: empire_persistence_registry_modification_run_keys_elevated_user. The malicious process establishes Run-key persistence (Sysmon 13, a value under CurrentVersion\\Run pointing at encoded PowerShell) and beacons to C2 (Sysmon 3). Ground truth is that process's persistence write plus its C2 connections. Registry writes (Sysmon 12/13) and network connections (Sysmon 3) both occur benignly in volume, so flag-all-registry and flag-all-network each capture only a fragment; flagging only the Run-key write (the single obvious IOC) misses the beaconing. High-volume subtle signal: the malicious Run-key write is one of many registry sets, separable only by the specific CurrentVersion\\Run target correlated to a process that also beacons. Objective F1 vs behaviour-derived ground truth. Data: OTRF Security-Datasets (GPL-3.0), vendored + obfuscated; source generator/labels stripped from the runtime image."
+category = "detection-engineering"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

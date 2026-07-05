@@ -1,0 +1,39 @@
+{
+    "id": "632263a3-03e5-4ba7-893e-1dae28a804a2",
+    "started_at": "2026-07-05T14:22:39.328331",
+    "updated_at": "2026-07-05T14:27:52.531589",
+    "finished_at": "2026-07-05T14:27:52.531589",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "terminus-2__gemini-3.5-flash__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.6016
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.6016": [
+                            "threat-hunt-windows-eventlogs__m6zr99V"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 1722629,
+        "n_cache_tokens": 1444667,
+        "n_output_tokens": 37605,
+        "cost_usd": 0.9720880499999999
+    }
+}

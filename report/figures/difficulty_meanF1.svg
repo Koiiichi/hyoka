@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="368" font-family="IBM Plex Mono, monospace" viewBox="0 0 820 368">
+<rect width="820" height="368" fill="#FFFFFF"/>
+<text x="24" y="34" font-family="Space Grotesk, sans-serif" font-size="19" fill="#0A0A0A">gemini-3.5-flash: mean F1 per task (5 trials each)</text>
+<line x1="230.0" y1="52" x2="230.0" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="230.0" y="46" font-size="10" fill="#666666" text-anchor="middle">0.0</text>
+<line x1="304.3" y1="52" x2="304.3" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="304.3" y="46" font-size="10" fill="#666666" text-anchor="middle">0.1</text>
+<line x1="378.6" y1="52" x2="378.6" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="378.6" y="46" font-size="10" fill="#666666" text-anchor="middle">0.2</text>
+<line x1="452.9" y1="52" x2="452.9" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="452.9" y="46" font-size="10" fill="#666666" text-anchor="middle">0.3</text>
+<line x1="527.1" y1="52" x2="527.1" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="527.1" y="46" font-size="10" fill="#666666" text-anchor="middle">0.4</text>
+<line x1="601.4" y1="52" x2="601.4" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="601.4" y="46" font-size="10" fill="#666666" text-anchor="middle">0.5</text>
+<line x1="675.7" y1="52" x2="675.7" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="675.7" y="46" font-size="10" fill="#666666" text-anchor="middle">0.6</text>
+<line x1="750.0" y1="52" x2="750.0" y2="298" stroke="#666666" stroke-width="0.5" stroke-dasharray="2,3"/>
+<text x="750.0" y="46" font-size="10" fill="#666666" text-anchor="middle">0.7</text>
+<text x="220" y="74" font-size="12" fill="#0A0A0A" text-anchor="end">discovery-account-enum</text>
+<rect x="230" y="60" width="15.6" height="18" fill="#0A0A0A"/>
+<text x="251.6" y="74" font-size="11" fill="#666666">0.021</text>
+<text x="220" y="108" font-size="12" fill="#0A0A0A" text-anchor="end">persistence-run-key</text>
+<rect x="230" y="94" width="51.3" height="18" fill="#0A0A0A"/>
+<text x="287.3" y="108" font-size="11" fill="#666666">0.069</text>
+<text x="220" y="142" font-size="12" fill="#0A0A0A" text-anchor="end">defense-evasion-injection</text>
+<rect x="230" y="128" width="78.7" height="18" fill="#0A0A0A"/>
+<text x="314.7" y="142" font-size="11" fill="#666666">0.106</text>
+<text x="220" y="176" font-size="12" fill="#0A0A0A" text-anchor="end">threat-hunt-eventlogs</text>
+<rect x="230" y="162" width="98.1" height="18" fill="#0A0A0A"/>
+<text x="334.1" y="176" font-size="11" fill="#666666">0.132</text>
+<text x="220" y="210" font-size="12" fill="#0A0A0A" text-anchor="end">execution-vbs-launcher</text>
+<rect x="230" y="196" width="107.0" height="18" fill="#0A0A0A"/>
+<text x="343.0" y="210" font-size="11" fill="#666666">0.144</text>
+<text x="220" y="244" font-size="12" fill="#0A0A0A" text-anchor="end">privesc-uac-bypass</text>
+<rect x="230" y="230" width="121.8" height="18" fill="#0A0A0A"/>
+<text x="357.8" y="244" font-size="11" fill="#666666">0.164</text>
+<text x="220" y="278" font-size="12" fill="#0A0A0A" text-anchor="end">lateral-movement-psexec</text>
+<rect x="230" y="264" width="147.8" height="18" fill="#0A0A0A"/>
+<text x="383.8" y="278" font-size="11" fill="#666666">0.199</text>
+<text x="24" y="328" font-size="11" fill="#0A0A0A">pass@3 = 0% on every task (perfect F1 required). No trial exceeded F1 0.62.</text>
+<text x="24" y="346" font-size="11" fill="#666666">Aggregate mean F1 = 0.119 across 35 trials. Oracle = 1.000, nop = 0.000 on all tasks.</text>
+</svg>

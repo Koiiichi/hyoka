@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "abundant-cyber-eval/web-shell-forensics-log-and-patch"
+description = "Correlate a web access log with a merged pull-request diff to reconstruct a multi-stage web intrusion (brute force -> valid accounts -> exploit an introduced upload endpoint -> web shell -> credential access -> discovery -> tool transfer -> archive -> exfiltration) and label each step with its MITRE ATT&CK technique, while rejecting benign look-alikes. Exact request-id set plus per-request technique family."
+authors = [{ name = "Muneeb Hassan", email = "m57hassa@uwaterloo.ca" }]
+keywords = ["cybersecurity", "soc", "threat-hunting", "log-analysis", "web-shell", "mitre-attack", "kill-chain"]
+
+[metadata]
+difficulty_explanation = "Lever-A rebuild (the cloudtrail recipe). The answer is not one insight but a heterogeneous 8-step intrusion, each step a different observable behavior mapping to a different MITRE technique family. The agent must (1) use the diff plus correlation to identify the single attacker among look-alikes (a legitimate admin's typo-then-success login, an internet scanner that probes the upload endpoint but never authenticates, a benign feature endpoint that takes a ?cmd= parameter, legitimate avatar uploads), (2) select the exact set of chain requests with no misses and no decoys, and (3) label each of the 8 with the correct technique family. That is ~16 independent decisions that must all be correct; a single extra decoy or one wrong family fails the exact verifier -- the property that put cloudtrail-privilege-escalation-hunt under 30% pass@3. Technique families are accepted with a lenient set per step to avoid ambiguity; sub-technique suffixes are optional. Hard in the overall eval's spread."
+category = "detection-engineering"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

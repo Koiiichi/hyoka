@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783282665.8985064,
+            "stop": 1783282665.9070945
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.00038891599979251623,
+                "start": 1783282665.9022267,
+                "stop": 1783282665.9028146,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.000408874995628139,
+                "start": 1783282665.9029422,
+                "stop": 1783282665.9070556,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffff86700800>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is one process that beacons to a C2 host and reads lsass memory; \"\n            \"flag exactly its malicious events (over-flagging benign activity destroys precision, \"\n            \"and missing the credential-theft or beaconing events destroys recall).\"\n        )\nE       AssertionError: F1=0.615 (precision=0.500, recall=0.800); flagged 8 events, 4 of 5 malicious. The intrusion is one process that beacons to a C2 host and reads lsass memory; flag exactly its malicious events (over-flagging benign activity destroys precision, and missing the credential-theft or beaconing events destroys recall).\nE       assert 0.6153846153846154 >= 0.99\n\n/tests/test_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

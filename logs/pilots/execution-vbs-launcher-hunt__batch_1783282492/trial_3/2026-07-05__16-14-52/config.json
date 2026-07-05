@@ -1,0 +1,16 @@
+{
+    "job_name": "2026-07-05__16-14-52",
+    "jobs_dir": "jobs/batch_1783282492/trial_3",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/execution-vbs-launcher-hunt"
+        }
+    ]
+}
