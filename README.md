@@ -1,14 +1,13 @@
-<p>
-<svg width="180" height="45" viewBox="0 0 560 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="hyoka wordmark">
-  <g transform="translate(28,20) scale(0.5)"><polygon points="142.4,57.6 25.8,96.5 103.5,174.2" fill="#0A0A0A"/></g>
-  <text x="130" y="90" font-family="'Space Grotesk','Segoe UI',sans-serif" font-weight="600" font-size="58" letter-spacing="-1.5" fill="#0A0A0A">hyoka</text>
-</svg>
-</p>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.svg">
+    <img src="assets/wordmark-light.svg" alt="hyoka" width="320" />
+  </picture>
+</div>
 
-> **An open-ended SOC threat-hunting evaluation for `gemini-3.5-flash`.**
-> Seven tasks, each a no-hint SQLite database of real Windows attack telemetry from OTRF
-> Security-Datasets, scored by F1 against Sigma/behaviour-derived ground truth.
-> **0% pass@3 on every task.** Aggregate mean F1 = 0.119 across 35 trials.
+<br>
+
+An open-ended SOC threat-hunting evaluation for `gemini-3.5-flash`, built on real Windows attack telemetry from OTRF Security-Datasets, scored by F1 against Sigma/behaviour-derived ground truth. **0% pass@3 on every task.** Aggregate mean F1 = 0.119 across 35 trials.
 
 ---
 
@@ -133,6 +132,11 @@ cd samples/<task-name>/tests && python3 -m pytest test_outputs.py -q
 bash samples/<task-name>/solution/solve.sh      # writes findings.json
 python3 samples/<task-name>/tests/score_reward.py   # should print 1.0000
 ```
+
+> [!TIP]
+> The lazy-baseline gate (`tooling/lazy_baseline_probe.py`) is the single most important
+> QA step — it proves the task signal cannot be solved by a single grep, flag-all, or
+> obvious heuristic. If any baseline passes the verifier, the task is under-specified.
 
 ---
 
