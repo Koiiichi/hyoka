@@ -1,0 +1,24 @@
+schema_version = "1.3"
+
+[task]
+name = "abundant-cyber-eval/cloudtrail-privilege-escalation-hunt"
+description = "Threat-hunt a week of AWS CloudTrail JSON events to find a real valid-accounts -> account-manipulation -> cloud-storage-exfil chain hidden in several thousand benign API calls."
+authors = [{ name = "Muneeb Hassan", email = "m57hassa@uwaterloo.ca" }]
+keywords = ["cybersecurity", "soc", "threat-hunting", "cloudtrail", "aws", "mitre-attack", "privilege-escalation"]
+
+[metadata]
+difficulty_explanation = "Requires correlating a single assumed-role session across thousands of CloudTrail events in a large JSON haystack: isolating one assume-role from an untrusted source IP, following its minted session key into an IAM policy-manipulation call, then into a burst of reads against a sensitive bucket -- while rejecting realistic look-alikes (a benign admin CreatePolicyVersion, a legitimate app reading the same bucket, a high-volume export against a non-sensitive bucket, and a read-only quarterly IAM audit). Medium-hard in the overall eval's spread."
+category = "detection-engineering"
+
+[verifier]
+timeout_sec = 300.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

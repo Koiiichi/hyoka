@@ -1,0 +1,34 @@
+{
+  "account_id": "123456789012",
+  "region": "us-east-1",
+  "log_window": {
+    "start": "2026-06-01",
+    "end": "2026-06-07"
+  },
+  "trusted_cidrs": [
+    "198.51.100.0/24",
+    "10.0.0.0/16"
+  ],
+  "ci_egress_ips": [
+    "198.51.100.20"
+  ],
+  "sensitive_buckets": [
+    "acme-customer-pii-prod"
+  ],
+  "iam_principals": {
+    "users": [
+      "alice",
+      "bob",
+      "carol",
+      "dave",
+      "erin",
+      "ci-runner"
+    ],
+    "roles": [
+      "ci-deploy-role",
+      "app-runtime-role",
+      "data-export-role",
+      "security-audit-role"
+    ]
+  }
+}
