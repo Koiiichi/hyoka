@@ -13,6 +13,70 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from statistics import mean
+import base64
+import urllib.request
+import re as _re
+
+HERE = Path(__file__).parent
+INK, PAPER, GREY = "#0A0A0A", "#FFFFFF", "#666666"
+
+
+# ---------------------------------------------------------------------------
+# Font embedding (ensures identical rendering in browser AND headless PDF)
+# ---------------------------------------------------------------------------
+_FONT_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+_FONT_URL = ("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700"
+             "&family=IBM+Plex+Mono:wght@400;500&display=swap")
+_FONT_CACHE = HERE / ".font_cache.css"
+
+
+def _fetch_inline_fonts() -> str:
+    """Return a <style> block with @font-face rules using base64 data URIs.
+
+    Downloads the latin subset of Space Grotesk and IBM Plex Mono from Google
+    Fonts once, caches the result in .font_cache.css next to this script, and
+    returns the same CSS on subsequent calls. This makes the generated HTML
+    fully self-contained so headless Chrome prints the correct fonts without
+    any network requests.
+    """
+    if _FONT_CACHE.exists():
+        return _FONT_CACHE.read_text(encoding="utf-8")
+
+    try:
+        req = urllib.request.Request(_FONT_URL, headers={"User-Agent": _FONT_UA})
+        css = urllib.request.urlopen(req, timeout=10).read().decode()
+    except Exception:
+        # Network unavailable — fall back to a minimal @import (fonts may differ in PDF)
+        return f'<link rel="stylesheet" href="{_FONT_URL}">'
+
+    blocks = _re.findall(
+        r'/\*\s*([\w\s-]+?)\s*\*/\s*(@font-face\s*\{[^}}]+\})', css, _re.DOTALL
+    )
+    face_rules = []
+    for subset, block in blocks:
+        if subset.strip() != "latin":
+            continue
+        m = _re.search(r"url\((https://[^)]+\.woff2)\)", block)
+        if not m:
+            continue
+        try:
+            req2 = urllib.request.Request(m.group(1), headers={"User-Agent": _FONT_UA})
+            data = base64.b64encode(urllib.request.urlopen(req2, timeout=10).read()).decode()
+        except Exception:
+            continue
+        # Replace the remote URL with a data URI
+        face_rules.append(block.replace(m.group(1), f"data:font/woff2;base64,{data}"))
+
+    if not face_rules:
+        return f'<link rel="stylesheet" href="{_FONT_URL}">'
+
+    result = "<style>\n" + "\n".join(face_rules) + "\n</style>"
+    _FONT_CACHE.write_text(result, encoding="utf-8")
+    return result
+
+
+INLINE_FONTS = _fetch_inline_fonts()
 
 HERE = Path(__file__).parent
 INK, PAPER, GREY = "#0A0A0A", "#FFFFFF", "#666666"
@@ -230,7 +294,7 @@ HTML = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hyoka — A Threat-Hunting Eval for gemini-3.5-flash</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+{INLINE_FONTS}
 <style>
 :root{{--ink:{INK};--paper:{PAPER};--grey:{GREY};--rule:#E6E6E6;}}
 *{{box-sizing:border-box}}

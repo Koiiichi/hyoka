@@ -49,3 +49,4 @@ docs/reference-reports/
 # --- Temporary local test artifacts ---
 samples/**/environment/data/generated_logs/
 /tmp/
+report/.font_cache.css
