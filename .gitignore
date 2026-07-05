@@ -1,0 +1,61 @@
+# ==========================================
+# Hyoka Project - .gitignore
+# ==========================================
+
+# --- OS Artifacts ---
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- Python Artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Environments & Dependencies ---
+.venv/
+venv/
+ENV/
+env/
+poetry.lock
+pdm.lock
+.pdm-plugins/
+
+# --- Secrets & Environment Variables ---
+# Absolutely critical to prevent leaking your Gemini API keys
+.env
+.env.local
+.env.*
+*.pem
+*.key
+credentials.json
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# --- Harbor & Runtime Outputs ---
+# Harbor dumps raw trial runs into a local 'jobs/' folder by default.
+# These trajectories, container logs, and metadata files can become massive.
+# Keep this ignored, and manage your final curated 'logs/' folder separately.
+jobs/
+
+# --- Local Testing Artifacts ---
+# Ignore temporary log generations from local debugging outside Harbor
+samples/**/environment/data/generated_logs/
+
+# --- Local .md files ---
+AGENT_DELEGATION.md
+ROADMAP.md
+SETUP_GUIDE.md
+report/OUTLINE.md
+
+# --- Reference .pdf files ---
+Task_ref.pdf
