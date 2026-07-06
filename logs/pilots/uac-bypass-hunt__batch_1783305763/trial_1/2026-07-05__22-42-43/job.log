@@ -1,0 +1,70 @@
+Skipping image OS validation for hb__7280876cc468ca8e8655542305a41f86: docker inspect returned 1
+Installing: tmux, asciinema
+Detected system: {'os': 'debian-based', 'package_manager': 'apt-get', 'update_command': None}
+Installing tools using apt-get: DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tmux asciinema
+Starting recording.
+Sending keys: ['asciinema rec --stdin /logs/agent/recording.cast', 'Enter'] min_timeout_sec: 1.0 max_timeout_sec: 180.0
+Sending keys: ['clear', 'Enter'] min_timeout_sec: 0.0 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db ".schema events"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT COUNT(*) FROM events;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events GROUP BY event_code ORDER BY COUNT(*) DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, message FROM events WHERE event_code = 4104;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, target_object, details FROM events WHERE event_code IN (12, 13, 14) AND (target_object LIKE \'%Windows Update%\' OR target_object LIKE \'%fodhelper%\' OR target_object LIKE \'%ms-settings%\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, message FROM events WHERE event_id IN (\'evt-01537\', \'evt-01896\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, target_object, details FROM events WHERE target_object LIKE \'%Windows Update%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, target_object, details FROM events WHERE event_code = 13 LIMIT 30;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, src_ip, dst_ip, dst_port FROM events WHERE event_code = 3;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, message FROM events WHERE event_code = 5156 AND timestamp LIKE \'2026-05-06T00:00:%\' LIMIT 30;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688) AND host = \'WS-05.corp.example\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, logon_type, src_ip FROM events WHERE event_code = 4624;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, user, image, command_line FROM events WHERE event_code IN (1, 4688) AND host != \'WS-05.corp.example\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, user, target_object, details, image FROM events WHERE event_id BETWEEN \'evt-00410\' AND \'evt-00430\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image, details FROM events WHERE event_code = 7 AND image LIKE \'%powershell.exe%\' LIMIT 20;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT event_code FROM events;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_image, granted_access FROM events WHERE event_code = 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_object FROM events WHERE event_code = 11;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, details FROM events WHERE event_code IN (17, 18);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_image, granted_access FROM events WHERE event_code = 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_object, details FROM events WHERE event_code = 11 AND target_object LIKE \'%temp%\' OR target_object LIKE \'%powershell%\' LIMIT 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_image, granted_access FROM events WHERE event_code = 10 AND image NOT IN (\'C:\\Windows\\system32\\svchost.exe\', \'C:\\Windows\\System32\\svchost.exe\', \'C:\\Windows\\System32\\lsass.exe\', \'C:\\Program Files\\Windows Defender\\MsMpEng.exe\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, image, target_image, granted_access FROM events WHERE event_code = 10 AND image NOT LIKE \'%svchost.exe%\' AND image NOT LIKE \'%lsass.exe%\' AND image NOT LIKE \'%MsMpEng.exe%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, host, image, target_object FROM events WHERE event_code = 11 AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%fodhelper.exe%\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, image, target_object, details, message FROM events WHERE event_id IN (\'evt-01342\', \'evt-01349\', \'evt-01467\', \'evt-01479\', \'evt-02077\', \'evt-02079\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-00305\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, image, command_line FROM events WHERE event_code IN (1, 4688) AND timestamp LIKE \'2026-05-06T00:00:29%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688) AND timestamp LIKE \'2026-05-06T00:00:27%\' OR timestamp LIKE \'2026-05-06T00:00:28%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, image, command_line FROM events WHERE event_code IN (1, 4688) AND timestamp >= \'2026-05-06T00:00:26\' AND timestamp <= \'2026-05-06T00:00:32\' ORDER BY timestamp;"\n'] min_timeout_sec: 1.0 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, image, target_object, details FROM events WHERE event_id = \'evt-01164\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, image, command_line FROM events WHERE event_code IN (1, 4688) AND host = \'WS-05.corp.example\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, image, target_object, details FROM events WHERE event_code IN (12, 13) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%fodhelper.exe%\') ORDER BY timestamp;"\n'] min_timeout_sec: 1.0 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Sending keys: ['cat << \'EOF\' > /root/findings.json\n[\n  "evt-00305",\n  "evt-00351",\n  "evt-00388",\n  "evt-00401",\n  "evt-00402",\n  "evt-00403",\n  "evt-00404",\n  "evt-00405",\n  "evt-00408",\n  "evt-00416",\n  "evt-00417",\n  "evt-00418",\n  "evt-00419",\n  "evt-00420",\n  "evt-00421",\n  "evt-00422",\n  "evt-00423",\n  "evt-00424",\n  "evt-00437",\n  "evt-00501",\n  "evt-00526",\n  "evt-00542",\n  "evt-00704",\n  "evt-00858",\n  "evt-01020",\n  "evt-01024",\n  "evt-01186",\n  "evt-01199",\n  "evt-01614",\n  "evt-02206",\n  "evt-02454",\n  "evt-02498",\n  "evt-02499",\n  "evt-02500",\n  "evt-02501",\n  "evt-03850",\n  "evt-03882"\n]\nEOF\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['cat /root/findings.json\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783305763/trial_1/2026-07-05__22-42-43/uac-bypass-hunt__6cghPAM/agent/trajectory.json
+Collecting main service artifacts
+Skipping image OS validation for hb__1bee7b3cf15246914ce7986d4c9913a2: docker inspect returned 1

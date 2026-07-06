@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+# Collected from the agent container and re-materialized at its original path
+# inside the separate verifier container (/root/findings.json).
+artifacts = ["/root/findings.json"]
+
+[task]
+name = "abundant-cyber-eval/credential-dump-hunt"
+description = "Threat-hunt a SQLite database of ~6,000 real Windows Security and Sysmon event logs (a real Empire+Mimikatz credential-theft campaign from the OTRF Security-Datasets corpus, deterministically time-shifted and entity-obfuscated) with no hints, and flag the exact malicious events. Scored by F1 against Sigma/behaviour-derived ground truth."
+
+[metadata]
+author_name = "Muneeb Hassan"
+author_email = "m57hassa@uwaterloo.ca"
+category = "detection-engineering"
+tags = ["cybersecurity", "soc", "threat-hunting", "windows-eventlogs", "sysmon", "credential-access", "mitre-attack"]
+expert_time_estimate_hours = 1.0
+difficulty_explanation = "Replicates the Cyber Defense Benchmark method (arXiv 2604.19533): a real attack recording from OTRF Security-Datasets, deterministically time-shifted and entity-obfuscated, loaded into a queryable SQLite DB of ~6,000 real events. The agent must threat-hunt with NO hints (no indicators, no time range, no affected host) and flag the malicious events (35 C2 network connections + 2 lsass memory reads from one confirmed-malicious powershell process, 0.6% of the corpus). Scored by F1 against Sigma/behaviour-derived ground truth -- fully objective, no ambiguous label axis. This is the source of genuine headroom that hand-authored synthetic tasks lacked: with no indicators and no time window, the malicious 0.6% must be recovered from ~6,000 real events by correlation alone, so keyword and single-event-type strategies collapse on precision. The professional who does this is a SOC threat hunter / detection engineer triaging raw endpoint telemetry. Difficulty comes from real, high-volume, messy telemetry with no guidance, not from a hidden trick. Data: OTRF Security-Datasets (GPL-3.0), vendored and obfuscated; source generator and labels are removed from the runtime image."
+solution_explanation = "The intrusion is a single confirmed-malicious powershell.exe process, identified by its most damning action and then expanded to its full high-signal footprint. First find the process that read lsass.exe memory (Sysmon EventID 10, target_image lsass.exe) with a credential-dumping access mask (e.g. 0x1010/0x1410/0x143a/0x1438/0x1418/0x1fffff) -- a Mimikatz-style credential dump. That process_guid is confirmed malicious. Then flag every event sharing that process_guid that is itself a high-signal detection: its lsass memory reads (EventID 10) and its C2 network connections (EventID 3). The union is the 37-event answer. The key insight is that the malicious set is 0.6% of ~6,000 events and has no indicator hints, so the solver must pivot from the one unambiguous credential-access event to the owning process and sweep that process's network beacons -- correlation by process_guid, not keyword search; ~25 lines of SQL/Python express it."
+verification_explanation = "The verifier reads the agent's /root/findings.json (collected as a declared artifact), parses it as a JSON list of event_id strings (dict items keyed event_id/id/eventid are also accepted), and computes precision, recall, and F1 by exact set arithmetic against tests/ground_truth.json, which is baked into the verifier image and never enters the agent container. The task passes iff F1 >= 0.99. With 37 ground-truth events this threshold is effectively exact-match and is not a fuzzy tolerance: a single spurious flag drops precision to 37/38 (F1 0.987) and a single miss drops recall to 36/37 (F1 0.986), both below 0.99, so 0.99 admits only the perfect set while sidestepping any floating-point edge of a literal == 1.0 comparison. reward.txt records the fractional F1 as a continuous signal."
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

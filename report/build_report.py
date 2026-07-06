@@ -87,22 +87,22 @@ INK, PAPER, GREY = "#0A0A0A", "#FFFFFF", "#666666"
 TRIALS = json.loads(Path("/tmp/trialdata.json").read_text())
 
 TASK_META = [
-    ("threat-hunt-windows-eventlogs", "Credential access + C2", "T1003 / T1071"),
-    ("lateral-movement-psexec-hunt", "Lateral movement", "T1021.002 / T1543"),
-    ("persistence-run-key-hunt", "Persistence", "T1547.001"),
-    ("discovery-account-enum-hunt", "Discovery", "T1069 / T1087"),
-    ("execution-vbs-launcher-hunt", "Execution", "T1059"),
-    ("defense-evasion-injection-hunt", "Defense evasion", "T1055 / T1218"),
-    ("privesc-uac-bypass-hunt", "Privilege escalation", "T1548.002"),
+    ("credential-dump-hunt", "Credential access + C2", "T1003 / T1071"),
+    ("psexec-lateral-hunt", "Lateral movement", "T1021.002 / T1543"),
+    ("run-key-hunt", "Persistence", "T1547.001"),
+    ("account-enumeration-hunt", "Discovery", "T1069 / T1087"),
+    ("vbs-launcher-hunt", "Execution", "T1059"),
+    ("lolbin-injection-hunt", "Defense evasion", "T1055 / T1218"),
+    ("uac-bypass-hunt", "Privilege escalation", "T1548.002"),
 ]
 SHORT = {
-    "threat-hunt-windows-eventlogs": "threat-hunt (cred access)",
-    "lateral-movement-psexec-hunt": "lateral-movement",
-    "persistence-run-key-hunt": "persistence",
-    "discovery-account-enum-hunt": "discovery",
-    "execution-vbs-launcher-hunt": "execution",
-    "defense-evasion-injection-hunt": "defense-evasion",
-    "privesc-uac-bypass-hunt": "privilege-esc",
+    "credential-dump-hunt": "credential-access",
+    "psexec-lateral-hunt": "lateral-movement",
+    "run-key-hunt": "persistence",
+    "account-enumeration-hunt": "discovery",
+    "vbs-launcher-hunt": "execution",
+    "lolbin-injection-hunt": "defense-evasion",
+    "uac-bypass-hunt": "privilege-esc",
 }
 # Hand-authored synthetic tasks that were piloted and solved by flash (cut).
 SYNTHETIC = [
@@ -201,10 +201,10 @@ def fig_pr():
     s.append(f'<rect x="{X(0.85):.1f}" y="{Y(0.06):.1f}" width="{X(1.0)-X(0.85):.1f}" height="{T+ph-Y(0.06):.1f}" fill="{INK}" opacity="0.05"/>')
     s.append(txt(X(0.86), Y(0.02)+2, "precision-collapse cluster (22 trials)", 9, GREY))
     # points, deterministic jitter
-    markers = {"threat-hunt-windows-eventlogs":"circle","lateral-movement-psexec-hunt":"circle",
-               "persistence-run-key-hunt":"circle","discovery-account-enum-hunt":"rect",
-               "execution-vbs-launcher-hunt":"circle","defense-evasion-injection-hunt":"circle",
-               "privesc-uac-bypass-hunt":"circle"}
+    markers = {"credential-dump-hunt":"circle","psexec-lateral-hunt":"circle",
+               "run-key-hunt":"circle","account-enumeration-hunt":"rect",
+               "vbs-launcher-hunt":"circle","lolbin-injection-hunt":"circle",
+               "uac-bypass-hunt":"circle"}
     for ti,(task,_,_) in enumerate(TASK_META):
         for j,t in enumerate(TRIALS[task]):
             jx = ((ti*7+j*13) % 11 - 5) * 0.004
@@ -272,17 +272,17 @@ def rows_difficulty():
 def rows_distribution():
     out = []
     src = {
-        "threat-hunt-windows-eventlogs": "empire_mimikatz_logonpasswords",
-        "lateral-movement-psexec-hunt": "empire_psexec_dcerpc_tcp_svcctl",
-        "persistence-run-key-hunt": "empire_persistence_registry_run_keys",
-        "discovery-account-enum-hunt": "empire net_localgroup + net_local_users",
-        "execution-vbs-launcher-hunt": "empire_launcher_vbs",
-        "defense-evasion-injection-hunt": "covenant_lolbin_wuauclt_createremotethread",
-        "privesc-uac-bypass-hunt": "empire_uac_shellapi_fodhelper",
+        "credential-dump-hunt": "empire_mimikatz_logonpasswords",
+        "psexec-lateral-hunt": "empire_psexec_dcerpc_tcp_svcctl",
+        "run-key-hunt": "empire_persistence_registry_run_keys",
+        "account-enumeration-hunt": "empire net_localgroup + net_local_users",
+        "vbs-launcher-hunt": "empire_launcher_vbs",
+        "lolbin-injection-hunt": "covenant_lolbin_wuauclt_createremotethread",
+        "uac-bypass-hunt": "empire_uac_shellapi_fodhelper",
     }
-    gt = {"threat-hunt-windows-eventlogs":37,"lateral-movement-psexec-hunt":4,"persistence-run-key-hunt":11,
-          "discovery-account-enum-hunt":14,"execution-vbs-launcher-hunt":5,"defense-evasion-injection-hunt":3,
-          "privesc-uac-bypass-hunt":7}
+    gt = {"credential-dump-hunt":37,"psexec-lateral-hunt":4,"run-key-hunt":11,
+          "account-enumeration-hunt":14,"vbs-launcher-hunt":5,"lolbin-injection-hunt":3,
+          "uac-bypass-hunt":7}
     for task, tac, tech in TASK_META:
         out.append(f"<tr><td>{task}</td><td>{tac}<br><span class='dim'>{tech}</span></td>"
                    f"<td><span class='dim'>{src[task]}</span></td><td class='m'>{gt[task]}</td></tr>")
@@ -360,7 +360,7 @@ ul.tight li{{margin:6px 0;}}
 <div class="meta"><span><b>Author</b> Muneeb Hassan</span><span><b>Model under test</b> gemini/gemini-3.5-flash (terminus-2)</span><span><b>Tasks</b> 7</span><span><b>Trials</b> 35 (5 / task)</span><span><b>Date</b> 2026-07-05</span></div>
 
 <div class="abstract"><div class="lab">Abstract</div>
-<p>Hyōka measures whether an LLM agent can perform the core, unautomated job of a SOC analyst: given a database of raw Windows event logs and <b>no hints</b>, identify the exact events that make up an intrusion. Each of the seven tasks wraps a real attack recording from the OTRF Security-Datasets corpus, deterministically time-shifted and entity-obfuscated into a queryable SQLite database, with ground truth derived from the corresponding Sigma detection rule and scored by F1. Against gemini-3.5-flash the suite is decisively hard: <b>0% pass@3 on every task</b>, aggregate mean F1 {AGG_MEAN:.3f} over 35 trials, while the oracle solver scores 1.000 and the no-op agent 0.000 throughout. The failures are genuine and uniform — the model reliably <i>locates</i> the malicious activity (recall ≈ 1.0) but cannot <i>scope</i> it, flagging up to 4,886 events for a 37-event answer. We situate the design in the recent literature (notably the <a href="https://arxiv.org/abs/2604.19533">Cyber Defense Benchmark</a> and <a href="https://arxiv.org/abs/2603.13517">CTI-REALM</a>), give a concrete 10→1,000 scaling plan, and document the deliberate pivot away from hand-authored synthetic tasks, which the model solved at 93–100% pass@3.</p></div>
+<p>Hyōka measures whether an LLM agent can perform the core, unautomated job of a SOC analyst: given a database of raw Windows event logs and <b>no hints</b>, identify the exact events that make up an intrusion. Each of the seven tasks wraps a real attack recording from the OTRF Security-Datasets corpus, deterministically time-shifted and entity-obfuscated into a queryable SQLite database, with ground truth derived from the corresponding Sigma detection rule and scored by F1. Against gemini-3.5-flash the suite is decisively hard: <b>0% pass@3 on every task</b>, aggregate mean F1 {AGG_MEAN:.3f} over 35 trials, while the oracle solver scores 1.000 and the no-op agent 0.000 throughout. The failures are genuine and uniform — the model reliably <i>locates</i> the malicious activity (recall ≈ 1.0) but cannot <i>scope</i> it, flagging up to 4,871 events for a 37-event answer. We situate the design in the recent literature (notably the <a href="https://arxiv.org/abs/2604.19533">Cyber Defense Benchmark</a> and <a href="https://arxiv.org/abs/2603.13517">CTI-REALM</a>), give a concrete 10→1,000 scaling plan, and document the deliberate pivot away from hand-authored synthetic tasks, which the model solved at 93–100% pass@3.</p></div>
 
 <div class="metrics">
 <div class="metric"><div class="v">0%</div><div class="l">pass@3 · every task</div></div>
@@ -408,9 +408,9 @@ ul.tight li{{margin:6px 0;}}
 
 <figure>{FIG2}<figcaption><b>Figure 2.</b> Precision versus recall for all 35 trials (circles; discovery shown as squares). The dense high-recall / near-zero-precision cluster is the dominant failure mode — "precision collapse." Discovery is the exception: it also loses recall (0.36), because the model catches one log source's evidence and misses the correlated events in another.</figcaption></figure>
 
-<p>Figure&nbsp;3 breaks the same data out per task as a distribution of trial F1 scores. Two things are visible. First, the spread is genuine and often bimodal — most trials near zero with an occasional partial hit (execution reaches 0.615, threat-hunt 0.602, privilege-escalation 0.400) — which is the signature of real difficulty rather than a broken verifier, since a task-design bug would produce uniform zeros. Second, no trial on any task comes close to the 1.0 line required to pass.</p>
+<p>Figure&nbsp;3 breaks the same data out per task as a distribution of trial F1 scores. Two things are visible. First, the spread is genuine and often bimodal — most trials near zero with an occasional partial hit (execution reaches 0.435, privilege-escalation 0.389, credential-dump 0.284) — which is the signature of real difficulty rather than a broken verifier, since a task-design bug would produce uniform zeros. Second, no trial on any task comes close to the 1.0 line required to pass.</p>
 
-<figure>{FIG3}<figcaption><b>Figure 3.</b> Per-task F1 across five trials each (dots), with the per-task mean (vertical bar) and min–max range (grey line). The right edge marks the F1 = 1.0 pass threshold; nothing approaches it. Persistence is perfectly consistent (all five trials identical at 0.069), a deterministic over-flagging strategy; the others vary trial to trial.</figcaption></figure>
+<figure>{FIG3}<figcaption><b>Figure 3.</b> Per-task F1 across five trials each (dots), with the per-task mean (vertical bar) and min–max range (grey line). The right edge marks the F1 = 1.0 pass threshold; nothing approaches it. Persistence is the most consistent task (all five trials cluster tightly at F1 ≈ 0.07), a near-deterministic over-flagging strategy; the others vary more.</figcaption></figure>
 
 <h3>2.2 What kinds of failure dominate</h3>
 <p>Quantitatively, the dominant failure is <b>precision collapse</b>: the model correctly identifies the malicious events but cannot separate them from benign context, so precision — and therefore F1 — is destroyed. A secondary mode, isolated to the discovery task, is a <b>cross-source recall gap</b>: the model finds the reconnaissance commands in Sysmon but never correlates them with the corresponding Windows Security membership-enumeration events, capping recall at 0.36. Both are diagnosed against real trajectories in §5.</p>
@@ -439,11 +439,11 @@ ul.tight li{{margin:6px 0;}}
 <p>Every failure below is genuine task difficulty rather than a task-design artifact. The argument is the same in each case and is grounded in the data of Figure&nbsp;2: on the identical inputs the oracle recovers the exact set (F1 = 1.0), the no-op agent scores 0, and the model's own recall and precision vary meaningfully across trials — an ambiguous instruction, broken environment, or over-strict verifier would instead produce uniform zeros. Trajectories are under <code>logs/pilots/</code>.</p>
 
 <h3>5.1 Precision collapse (persistence, lateral movement, and most trials)</h3>
-<p>On <b>persistence-run-key-hunt</b>, all five trials flagged exactly 309 events and captured all 11 malicious ones: recall 1.0, precision 0.036, F1 0.069. The model correctly found the Run-key persistence value and the beaconing process, then failed to stop — sweeping in benign registry and network events around them. <b>lateral-movement-psexec-hunt</b> shows the same at the extreme: one trial flagged 1,247 events to capture its 4 (F1 0.006). The model knows <i>where</i> the intrusion is; it cannot delimit it. This is the modal outcome across the suite (22 of 35 trials sit in the precision-collapse cluster of Figure&nbsp;2).</p>
+<p>On <b>run-key-hunt</b>, all five trials flagged ~290–340 events and captured all 11 malicious ones: recall 1.0, precision ≈ 0.036, F1 ≈ 0.069. The model correctly found the Run-key persistence value and the beaconing process, then failed to stop — sweeping in benign registry and network events around them. <b>psexec-lateral-hunt</b> shows the same at the extreme: every one of its five trials recovered all 4 malicious events (recall 1.0), but one flagged 644 events to do so (F1 0.012). The model knows <i>where</i> the intrusion is; it cannot delimit it. This is the modal outcome across the suite (17 of 35 trials sit in the precision-collapse cluster of Figure&nbsp;2).</p>
 <h3>5.2 Cross-source recall gap (discovery)</h3>
-<p><b>discovery-account-enum-hunt</b> is the one task where recall itself fails: every trial flagged 400–500 events but recovered only 5 of 14 malicious (recall 0.36, F1 ≈ 0.02). The model identified the <code>net.exe</code> reconnaissance commands in Sysmon but never connected them to the Windows Security 4798/4799 group-membership-enumeration events that record the same behaviour in a different log — so it missed the correlated half of the answer while still over-flagging. The task was designed to require exactly this Sysmon↔Security correlation, and the model did not perform it.</p>
+<p><b>account-enumeration-hunt</b> is the one task where recall itself fails: every one of the five trials recovered only 5 of 14 malicious (recall 0.36). Four of the five also over-flagged massively (400–500 events, F1 ≈ 0.02); the fifth kept precision far tighter (17 events flagged) yet, with the same recall gap, still reached only F1 0.32. In every case the model identified the <code>net.exe</code> reconnaissance commands in Sysmon but never connected them to the Windows Security 4798/4799 group-membership-enumeration events that record the same behaviour in a different log — so it missed the correlated half of the answer. The task was designed to require exactly this Sysmon↔Security correlation, and the model did not perform it.</p>
 <h3>5.3 Partial chains and the occasional near-hit</h3>
-<p>A minority of trials get partway. <b>lateral-movement</b> trial 3 flagged 16 events for 3 of 4 malicious (F1 0.30) — it reconstructed most of the Security+System+Sysmon service-execution chain but dropped one facet. <b>execution</b> trial 4 (F1 0.615) and <b>threat-hunt</b> trial 2 (F1 0.602, 86 events flagged for 37) are the best results in the entire run, and still fall far short of a pass. These near-hits confirm the tasks are calibrated at the model's frontier rather than beyond it: the capability is present but unreliable, which is precisely the regime a training-signal eval should target.</p>
+<p>A minority of trials get partway. <b>psexec-lateral</b>'s best trial reconstructed the full Security+System+Sysmon service-execution chain (all 4 events, recall 1.0) and kept its flag set to 20 events (F1 0.33) — a near-hit lost only to residual over-flagging. <b>credential-dump</b>, the largest task, recovered all 37 malicious events in every trial (recall 1.0) but even its tightest trial flagged 224 (F1 0.284). <b>execution</b> is the sharpest illustration of the precision problem and the strongest single result in the run: all five of its trials recovered the full 5-event process tree (recall 1.0), yet flagged anywhere from 18 to 1,183 events to do so — its best trial (18 events, F1 0.435) still falls far short of a pass purely on precision. These near-hits confirm the tasks are calibrated at the model's frontier rather than beyond it: the capability is present but unreliable, which is precisely the regime a training-signal eval should target.</p>
 
 <h2 id="sa"><span class="num">A</span>Appendix: how the eval was built</h2>
 <p>The brief notes that the curation process is itself signal, so we record it plainly. The first six tasks were <b>hand-authored synthetic generators</b>: an auth-log lateral-movement hunt, a CloudTrail privilege-escalation hunt, a Sigma-authoring task, a web-shell log-plus-diff correlation, and two execution-based vulnerability-repair tasks. Every one was solved by gemini-3.5-flash at 93–100% pass@3 (Figure&nbsp;1), and two apparent "0%" results turned out to be scoring artifacts — a CloudTrail ground-truth label that was itself incorrect, and a web-shell answer penalised on a count threshold for a defensible inclusion — not genuine difficulty. Those tasks are retained under <code>cut_synthetic/</code> for transparency.</p>

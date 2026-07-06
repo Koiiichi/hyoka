@@ -1,0 +1,16 @@
+{
+    "job_name": "2026-07-05__21-16-57",
+    "jobs_dir": "jobs/batch_1783300617/trial_2",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/account-enumeration-hunt"
+        }
+    ]
+}

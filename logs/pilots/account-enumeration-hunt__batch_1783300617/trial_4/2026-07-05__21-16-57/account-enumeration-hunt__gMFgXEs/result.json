@@ -1,0 +1,175 @@
+{
+    "id": "23fba62e-46e2-4e46-9994-b9f514b7995e",
+    "task_name": "abundant-cyber-eval/account-enumeration-hunt",
+    "trial_name": "account-enumeration-hunt__gMFgXEs",
+    "trial_uri": "file:///Users/muneebhassan/Work/git_store/hyo%CC%84ka/jobs/batch_1783300617/trial_4/2026-07-05__21-16-57/account-enumeration-hunt__gMFgXEs",
+    "task_id": {
+        "path": "samples/account-enumeration-hunt"
+    },
+    "source": null,
+    "task_checksum": "49d66238ddb3733db049ebbbf9dec6bb621f13056575a835ca49b0d88bf27beb",
+    "config": {
+        "task": {
+            "path": "samples/account-enumeration-hunt",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "account-enumeration-hunt__gMFgXEs",
+        "trials_dir": "jobs/batch_1783300617/trial_4/2026-07-05__21-16-57",
+        "install_only": false,
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "gemini/gemini-3.5-flash",
+            "n_concurrent": null,
+            "concurrency_group": null,
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "dc3d157c-7aac-45e0-a385-c2697a93bb5e"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "gemini-3.5-flash",
+            "provider": "gemini"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 3150852,
+        "n_cache_tokens": 2812468,
+        "n_output_tokens": 34629,
+        "cost_usd": 1.2411072,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 59,
+            "api_request_times_msec": [
+                2148.5331058502197,
+                3851.9721031188965,
+                2457.6849937438965,
+                2629.5759677886963,
+                2627.548933029175,
+                4171.702861785889,
+                5175.9350299835205,
+                3040.513038635254,
+                2960.8190059661865,
+                5260.910749435425,
+                3432.9609870910645,
+                1611.076831817627,
+                3111.0880374908447,
+                4050.3242015838623,
+                2620.9609508514404,
+                4090.6829833984375,
+                1827.2850513458252,
+                2385.7779502868652,
+                2084.9902629852295,
+                2111.301898956299,
+                3648.1332778930664,
+                1948.9080905914307,
+                1615.417242050171,
+                2433.151960372925,
+                2674.4089126586914,
+                1745.255947113037,
+                2848.6921787261963,
+                1687.7188682556152,
+                4065.113306045532,
+                2911.409854888916,
+                3049.4279861450195,
+                3587.8329277038574,
+                9510.840892791748,
+                2469.1128730773926,
+                1705.895185470581,
+                1663.5050773620605,
+                1770.44677734375,
+                1763.1251811981201,
+                1611.2818717956543,
+                1729.3782234191895,
+                2999.657154083252,
+                6786.7841720581055,
+                2250.121831893921,
+                3641.0796642303467,
+                2042.6790714263916,
+                6522.308111190796,
+                3543.6370372772217,
+                2230.0260066986084,
+                6554.71396446228,
+                4080.0418853759766,
+                6959.676027297974,
+                4601.337671279907,
+                2046.5271472930908,
+                7161.420106887817,
+                2127.195119857788,
+                1934.8058700561523,
+                14288.081169128418,
+                15563.506841659546,
+                1700.9878158569336
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.3226
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-07-06T01:16:59.513271Z",
+    "finished_at": "2026-07-06T01:21:51.590611Z",
+    "environment_setup": {
+        "started_at": "2026-07-06T01:16:59.551374Z",
+        "finished_at": "2026-07-06T01:17:07.673072Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-07-06T01:17:07.673262Z",
+        "finished_at": "2026-07-06T01:17:15.321466Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-07-06T01:17:15.321824Z",
+        "finished_at": "2026-07-06T01:21:44.389112Z"
+    },
+    "verifier": {
+        "started_at": "2026-07-06T01:21:46.902049Z",
+        "finished_at": "2026-07-06T01:21:51.590578Z"
+    },
+    "step_results": null
+}

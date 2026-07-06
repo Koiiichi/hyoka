@@ -1,0 +1,159 @@
+Skipping image OS validation for hb__9191ba060b9c276633648980cca0be09: docker inspect returned 1
+Installing: tmux, asciinema
+Detected system: {'os': 'debian-based', 'package_manager': 'apt-get', 'update_command': None}
+Installing tools using apt-get: DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tmux asciinema
+Starting recording.
+Sending keys: ['asciinema rec --stdin /logs/agent/recording.cast', 'Enter'] min_timeout_sec: 1.0 max_timeout_sec: 180.0
+Sending keys: ['clear', 'Enter'] min_timeout_sec: 0.0 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db ".schema events"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events GROUP BY event_code ORDER BY 2 DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, message, details FROM events WHERE event_code = 4104;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, service_name, service_file_name, details, message FROM events WHERE event_code IN (7045, 4697);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, message FROM events WHERE host = \'WS-06.corp.example\' AND timestamp LIKE \'2026-05-06T00:00:%\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, message FROM events WHERE event_code IN (4697, 7045, 7009, 7000);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host, user, target_user, logon_type, service_name, service_file_name FROM events WHERE event_code = 4697;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user, logon_type, command_line FROM events WHERE host = \'WS-06.corp.example\' AND timestamp BETWEEN \'2026-05-06T00:00:00Z\' AND \'2026-05-06T00:01:00Z\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user, details, message FROM events WHERE event_code = 4697;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user, logon_type, message FROM events WHERE message LIKE \'%2990D17%\' OR message LIKE \'%2990d17%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user FROM events WHERE event_code = 4697;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user, logon_type, command_line FROM events WHERE message LIKE \'%0x2990D17%\' OR details LIKE \'%0x2990D17%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, src_ip, message, details FROM events WHERE event_id = \'evt-01209\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT host FROM events WHERE src_ip = \'172.18.39.5\' OR dst_ip = \'172.18.39.5\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, command_line FROM events WHERE message LIKE \'%172.18.39.5%\' OR details LIKE \'%172.18.39.5%\' LIMIT 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, parent_image, command_line FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (1, 4688) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, message, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4104 ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' GROUP BY event_code ORDER BY 2 DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, command_line, details, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (22, 11, 23, 3) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, dst_ip, dst_port, details, message FROM events WHERE event_id IN (\'evt-01365\', \'evt-01367\', \'evt-01370\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, message, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4103 LIMIT 15;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message, details FROM events WHERE event_id = \'evt-01365\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, command_line, details, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4103 AND (message IS NOT NULL AND message != \'\' OR details IS NOT NULL AND details != \'\') LIMIT 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-01365\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4103 LIMIT 1;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host, details, message FROM events WHERE event_code = 22 AND (details IS NOT NULL AND details != \'\' OR message IS NOT NULL AND message != \'\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, parent_image, command_line, details, message FROM events WHERE process_guid = \'{b34bc01c-7dfc-5f67-de11-000000000400}\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, dst_ip, dst_port FROM events WHERE dst_ip = \'18.18.18.1\' OR src_ip = \'18.18.18.1\' OR message LIKE \'%18.18.18.1%\' OR details LIKE \'%18.18.18.1%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, event_code, dst_ip, dst_port FROM events WHERE event_code IN (3, 5156, 5158) AND dst_ip NOT LIKE \'172.1%\' AND dst_ip NOT LIKE \'10.%\' AND dst_ip NOT LIKE \'127.%\' AND dst_ip NOT LIKE \'fe80%\' AND dst_ip NOT LIKE \'::1\' AND dst_ip IS NOT NULL AND dst_ip != \'\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, process_guid, parent_image, command_line FROM events WHERE event_id = \'evt-01057\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, process_guid, image, parent_image, command_line FROM events WHERE parent_image LIKE \'%cmd.exe%\' OR message LIKE \'%d273d0f0-8078-5f67-cb06-000000000800%\' OR details LIKE \'%d273d0f0-8078-5f67-cb06-000000000800%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, dst_ip, dst_port, details, message FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT MIN(timestamp), MAX(timestamp) FROM events;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, target_user, logon_type, command_line FROM events WHERE host = \'DC01.corp.example\' AND (user LIKE \'%ward%\' OR target_user LIKE \'%ward%\' OR message LIKE \'%ward%\' OR details LIKE \'%ward%\') ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, dst_ip, dst_port FROM events WHERE dst_ip = \'10.10.10.5\' OR src_ip = \'10.10.10.5\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT host FROM events;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT message, details FROM events WHERE event_id = \'evt-01222\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'WS-06\' GROUP BY event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'WS-06.corp.example\' GROUP BY event_code ORDER BY 2 DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, parent_image, command_line FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (1, 4688) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, dst_ip, dst_port FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 3 ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, details, message FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (22, 4104) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, src_ip, dst_ip, dst_port, process_guid, image FROM events WHERE event_id IN (\'evt-01364\', \'evt-01366\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, dst_ip, dst_port FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 3;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, dst_ip, dst_port, details, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 5156;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, dst_ip, dst_port, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 5156;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, dst_ip, dst_port FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 5156;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, message, details FROM events WHERE event_id IN (\'evt-01225\', \'evt-01229\', \'evt-01232\', \'evt-01236\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 5156;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, message FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 5156 AND timestamp BETWEEN \'2026-05-06T00:00:48Z\' AND \'2026-05-06T00:01:00Z\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, message FROM events WHERE event_id IN (\'evt-01205\', \'evt-01206\', \'evt-01207\', \'evt-01543\', \'evt-01608\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, target_user, logon_type, message FROM events WHERE host = \'DC01.corp.example\' AND timestamp BETWEEN \'2026-05-06T00:00:46Z\' AND \'2026-05-06T00:00:50Z\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, message, details FROM events WHERE host = \'WS-06\' ORDER BY timestamp LIMIT 20;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT MIN(timestamp), MAX(timestamp) FROM events WHERE host = \'WS-06\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT image FROM events WHERE host = \'WS-05.corp.example\' AND channel LIKE \'%Sysmon%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, command_line FROM events WHERE host = \'WS-06.corp.example\' AND (user LIKE \'%ward%\' OR image LIKE \'%powershell%\' OR image LIKE \'%cmd.exe%\' OR command_line LIKE \'%Updater%\' OR command_line LIKE \'%powershell%\') ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, process_guid FROM events WHERE event_id = \'evt-01073\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, process_guid, message, details FROM events WHERE event_id = \'evt-02901\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host FROM events WHERE process_guid = \'{d273d0f0-808e-5f67-cf06-000000000800}\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cb06-000000000800}\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE host = \'WS-06\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE host = \'WS-06\' ORDER BY timestamp;" > /tmp/host_ws06.txt\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\' ORDER BY timestamp;" > /tmp/proc_powershell.txt\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cb06-000000000800}\' ORDER BY timestamp;" > /tmp/proc_cmd.txt\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE process_guid = \'{d273d0f0-808e-5f67-cf06-000000000800}\' ORDER BY timestamp;" > /tmp/proc_whoami.txt\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['wc -l /tmp/host_ws06.txt /tmp/proc_powershell.txt /tmp/proc_cmd.txt /tmp/proc_whoami.txt\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT host, event_code, COUNT(*) FROM events WHERE process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\' GROUP BY host, event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, user, image, command_line, message FROM events WHERE host = \'WS-05.corp.example\' AND timestamp BETWEEN \'2026-05-06T00:00:48Z\' AND \'2026-05-06T00:00:49Z\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, user, image, message FROM events WHERE host = \'WS-05.corp.example\' AND timestamp LIKE \'2026-05-06T00:00:48%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, user, image FROM events WHERE (host = \'WS-05.corp.example\' OR host = \'WS-05\') AND timestamp BETWEEN \'2026-05-06T00:00:48.800Z\' AND \'2026-05-06T00:00:48.999Z\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, message, details FROM events WHERE event_id IN (\'evt-01221\', \'evt-01223\', \'evt-01227\', \'evt-01231\', \'evt-01234\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, message, details FROM events WHERE event_id IN (\'evt-01360\', \'evt-01362\', \'evt-01374\', \'evt-01376\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, message FROM events WHERE event_id IN (\'evt-01221\', \'evt-01223\', \'evt-01227\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, target_image, granted_access FROM events WHERE event_id IN (\'evt-01360\', \'evt-01362\', \'evt-01374\', \'evt-01376\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image, target_image, granted_access FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 10 AND (process_guid = \'{d273d0f0-8078-5f67-cc06-000000000800}\' OR process_guid = \'{d273d0f0-8078-5f67-cb06-000000000800}\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image, target_image, details, message FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 10 AND (details LIKE \'%d273d0f0-8078-5f67-cc06-000000000800%\' OR details LIKE \'%d273d0f0-8078-5f67-cb06-000000000800%\' OR message LIKE \'%d273d0f0-8078-5f67-cc06-000000000800%\' OR message LIKE \'%d273d0f0-8078-5f67-cb06-000000000800%\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Sending keys: ['cat << \'EOF\' > /tmp/build_findings.py\nimport json\n\nevent_ids = set()\n\n# Read event IDs from files\nfor filename in [\'/tmp/host_ws06.txt\', \'/tmp/proc_powershell.txt\', \'/tmp/proc_cmd.txt\', \'/tmp/proc_whoami.txt\']:\n    with open(filename, \'r\') as f:\n        for line in f:\n            evt = line.strip()\n            if evt:\n                event_ids.add(evt)\n\n# Add individual specific events on WS-05.corp.example\nws05_events = [\n    \'evt-01221\', \'evt-01223\', \'evt-01225\', \'evt-01227\', \'evt-01229\', \n    \'evt-01231\', \'evt-01232\', \'evt-01234\', \'evt-01236\', \'evt-01282\', \n    \'evt-01295\', \'evt-01361\', \'evt-01363\', \'evt-01365\', \'evt-01367\', \n    \'evt-01370\', \'evt-01372\'\n]\nfor evt in ws05_events:\n    event_ids.add(evt)\n\n# Add individual specific events on DC01.corp.example\ndc01_events = [\n    \'evt-01218\', \'evt-01219\', \'evt-01222\'\n]\nfor evt in dc01_events:\n    event_ids.add(evt)\n\n# Add individual specific events on WS-06.corp.example (not in the process_guid sets)\nws06_events = [\n    \'evt-01206\', \'evt-01207\', \'evt-01364\', \'evt-01366\', # inbound net\n    \'evt-01208\', \'evt-01209\', \'evt-01210\', \'evt-03552\', # logon/logoff\n    \'evt-01211\', \'evt-01212\', \'evt-01213\', \'evt-01214\', # service creation\n    \'evt-01251\', \'evt-01253\', \'evt-01254\',             # service creation system\n    \'evt-01827\',                                         # powershell script block\n    \'evt-01240\'                                          # conhost\n]\nfor evt in ws06_events:\n    event_ids.add(evt)\n\noutput_list = sorted(list(event_ids))\nprint(f"Total unique malicious events: {len(output_list)}")\n\nwith open(\'/root/findings.json\', \'w\') as f:\n    json.dump(output_list, f)\nEOF\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['python3 /tmp/build_findings.py\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Parser warnings: - Extra text detected after JSON object
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783303767/trial_2/2026-07-05__22-09-27/psexec-lateral-hunt__chwCuyT/agent/trajectory.json
+Collecting main service artifacts
+Skipping image OS validation for hb__e7cbc2224780514ff7200073ad8fd2a9: docker inspect returned 1

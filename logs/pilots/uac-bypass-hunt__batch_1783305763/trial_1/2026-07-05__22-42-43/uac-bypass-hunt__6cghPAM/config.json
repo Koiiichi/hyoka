@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/uac-bypass-hunt"
+    },
+    "trial_name": "uac-bypass-hunt__6cghPAM",
+    "trials_dir": "jobs/batch_1783305763/trial_1/2026-07-05__22-42-43",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "94cf08c6-6e48-4042-8080-7814cb841242"
+}

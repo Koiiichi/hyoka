@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783306020.8488462,
+            "stop": 1783306020.8578024
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.0004200829935143702,
+                "start": 1783306020.852668,
+                "stop": 1783306020.853271,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.00043212399759795517,
+                "start": 1783306020.8533792,
+                "stop": 1783306020.8577585,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffff9068bda0>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is a fodhelper UAC bypass: a hijack of the HKCU ms-settings\\\\Shell\\\\Open\\\\command \"\n            \"registry key (Sysmon 12/13) pointing at encoded PowerShell, the auto-elevating fodhelper.exe \"\n            \"launch (Sysmon 1), and the elevated child it spawns; flag exactly those (over-flagging benign \"\n            \"activity destroys precision, and flagging only the fodhelper launch while missing the registry \"\n            \"hijack or the elevated child destroys recall).\"\n        )\nE       AssertionError: F1=0.389 (precision=0.241, recall=1.000); flagged 29 events, 7 of 7 malicious. The intrusion is a fodhelper UAC bypass: a hijack of the HKCU ms-settings\\Shell\\Open\\command registry key (Sysmon 12/13) pointing at encoded PowerShell, the auto-elevating fodhelper.exe launch (Sysmon 1), and the elevated child it spawns; flag exactly those (over-flagging benign activity destroys precision, and flagging only the fodhelper launch while missing the registry hijack or the elevated child destroys recall).\nE       assert 0.3888888888888889 >= 0.99\n\ntest_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

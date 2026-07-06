@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783302538.2558436,
+            "stop": 1783302538.2641082
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.00038920799852348864,
+                "start": 1783302538.2593071,
+                "stop": 1783302538.259849,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.000389750006434042,
+                "start": 1783302538.2599547,
+                "stop": 1783302538.2640672,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffff92b5ebd0>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is a script-host execution chain: a VBScript run by wscript/cscript \"\n            \"spawns a PowerShell stager whose process tree runs discovery and beacons out; flag \"\n            \"exactly that tree's process creations and network connections (over-flagging benign \"\n            \"activity destroys precision, and missing the spawned shell, its children, or the \"\n            \"network beacon destroys recall).\"\n        )\nE       AssertionError: F1=0.008 (precision=0.004, recall=1.000); flagged 1183 events, 5 of 5 malicious. The intrusion is a script-host execution chain: a VBScript run by wscript/cscript spawns a PowerShell stager whose process tree runs discovery and beacons out; flag exactly that tree's process creations and network connections (over-flagging benign activity destroys precision, and missing the spawned shell, its children, or the network beacon destroys recall).\nE       assert 0.008417508417508417 >= 0.99\n\ntest_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

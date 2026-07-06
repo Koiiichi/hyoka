@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/account-enumeration-hunt"
+    },
+    "trial_name": "account-enumeration-hunt__hyZkpGY",
+    "trials_dir": "jobs/batch_1783300617/trial_3/2026-07-05__21-16-57",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "0234d49a-f064-4bbb-9cb0-0847ab3ad9f3"
+}

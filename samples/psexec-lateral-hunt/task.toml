@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+# Collected from the agent container and re-materialized at its original path
+# inside the separate verifier container (/root/findings.json).
+artifacts = ["/root/findings.json"]
+
+[task]
+name = "abundant-cyber-eval/psexec-lateral-hunt"
+description = "Threat-hunt a SQLite database of real Windows Security + System + Sysmon logs (a real PsExec-style remote-execution recording from OTRF Security-Datasets, deterministically time-shifted and entity-obfuscated) with no hints, and flag the cross-source lateral-movement chain. Scored by F1 against Sigma/behaviour-derived ground truth."
+
+[metadata]
+author_name = "Muneeb Hassan"
+author_email = "m57hassa@uwaterloo.ca"
+category = "detection-engineering"
+tags = ["cybersecurity", "soc", "threat-hunting", "lateral-movement", "psexec", "sysmon", "mitre-attack"]
+expert_time_estimate_hours = 1.0
+difficulty_explanation = "Confirmed OTRF template (arXiv 2604.19533). Source: empire_psexec_dcerpc_tcp_svcctl. The malicious activity is a remote-service execution whose evidence is deliberately split across THREE log sources: the non-machine network logon (Security 4624 type 3, buried among benign machine-account logons), the suspicious service install in both Security (4697) and the System log (7045), and the service-spawned encoded-PowerShell process (Sysmon 1). No single event type or log source contains the whole chain, so cross-source correlation is required: flag-all-network-logons, flag-all-service-installs, and flag-all-process-creation each capture only a fragment and score low F1. The professional who does this is a SOC threat hunter / detection engineer triaging raw endpoint telemetry. Objective F1 vs behaviour-derived ground truth; no ambiguous label axis. Data: OTRF Security-Datasets (GPL-3.0), vendored + obfuscated; source generator/labels stripped from the runtime image."
+solution_explanation = "The PsExec-style chain must be reassembled from three log sources. (1) The stager service install: Security 4697 and System 7045 events whose service_file_name is an encoded PowerShell command (contains 'powershell' and an '-enc'/'enc' flag). (2) The authentication behind it: the Security 4624 type-3 network logon whose target_user is a real account, not a machine account (excludes names ending in '$', plus ANONYMOUS LOGON) — this is the one interactive-style logon among many benign machine-account logons. (3) The payload: the Sysmon 1 process creation whose parent is services.exe and whose command line contains '-enc' (the service-spawned encoded PowerShell). The union of those events is the answer. The key insight is that no single log holds the whole chain and the malicious logon is distinguished only by its non-machine target_user; ~20 lines of SQL express it."
+verification_explanation = "The verifier reads the agent's /root/findings.json (collected as a declared artifact), parses it as a JSON list of event_id strings (dict items keyed event_id/id/eventid are also accepted), and computes precision, recall, and F1 by exact set arithmetic against tests/ground_truth.json, which is baked into the verifier image and never enters the agent container. The task passes iff F1 >= 0.99. With 4 ground-truth events this threshold is effectively exact-match and is not a fuzzy tolerance: a single spurious flag drops precision to 4/5 (F1 0.889) and a single miss drops recall to 3/4 (F1 0.857), both below 0.99, so 0.99 admits only the perfect set while sidestepping any floating-point edge of a literal == 1.0 comparison. reward.txt records the fractional F1 as a continuous signal."
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

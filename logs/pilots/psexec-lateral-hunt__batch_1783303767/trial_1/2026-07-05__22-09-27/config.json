@@ -1,0 +1,15 @@
+{
+    "jobs_dir": "jobs/batch_1783303767/trial_1",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/psexec-lateral-hunt"
+        }
+    ]
+}

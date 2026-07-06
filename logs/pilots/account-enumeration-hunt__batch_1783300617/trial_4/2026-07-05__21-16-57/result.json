@@ -1,0 +1,39 @@
+{
+    "id": "dc3d157c-7aac-45e0-a385-c2697a93bb5e",
+    "started_at": "2026-07-05T21:16:58.183244",
+    "updated_at": "2026-07-05T21:21:51.593753",
+    "finished_at": "2026-07-05T21:21:51.593753",
+    "n_total_trials": 1,
+    "stats": {
+        "n_completed_trials": 1,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "terminus-2__gemini-3.5-flash__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.3226
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.3226": [
+                            "account-enumeration-hunt__gMFgXEs"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 3150852,
+        "n_cache_tokens": 2812468,
+        "n_output_tokens": 34629,
+        "cost_usd": 1.2411072
+    }
+}

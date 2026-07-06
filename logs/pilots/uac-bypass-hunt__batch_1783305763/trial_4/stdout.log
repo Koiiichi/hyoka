@@ -1,0 +1,23 @@
+  1/1 Mean: 0.226 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 0:04:21 0:00:00
+
+adhoc • terminus-2 • gemini-3.5-flash
+┏━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━┓
+┃ Trials ┃ Exceptions ┃  Mean ┃
+┡━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━┩
+│      1 │          0 │ 0.226 │
+└────────┴────────────┴───────┘
+
+┏━━━━━━━━┳━━━━━━━┓
+┃ Reward ┃ Count ┃
+┡━━━━━━━━╇━━━━━━━┩
+│ 0.2258 │     1 │
+└────────┴───────┘
+
+Job Info
+Total runtime: 4m 21s
+Results written to 
+jobs/batch_1783305763/trial_4/2026-07-05__22-42-43/result.json
+Inspect results by running `harbor view jobs/batch_1783305763/trial_4`
+Share results by running `harbor upload 
+jobs/batch_1783305763/trial_4/2026-07-05__22-42-43`
+

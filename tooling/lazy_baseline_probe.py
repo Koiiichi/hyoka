@@ -100,7 +100,10 @@ def main() -> int:
     task_path = Path(args.task_path).resolve()
     generator = task_path / "environment" / "data" / "build_inputs.py"
     oracle = task_path / "solution" / "solve.sh"
-    baselines_dir = task_path / "solution" / "lazy_baselines"
+    # Lazy baselines are dev/QA artifacts kept out of the shipped task dir (they
+    # are not required to build/run/solve/verify the task). They live alongside
+    # this probe under tooling/lazy_baselines/<task-name>/.
+    baselines_dir = Path(__file__).resolve().parent / "lazy_baselines" / task_path.name
 
     if not generator.exists():
         print(f"FATAL: generator not found: {generator}", file=sys.stderr)

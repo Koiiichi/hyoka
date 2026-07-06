@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/lolbin-injection-hunt"
+    },
+    "trial_name": "lolbin-injection-hunt__Hq4xswJ",
+    "trials_dir": "jobs/batch_1783299599/trial_5/2026-07-05__20-59-59",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "cccba9cd-8f07-48d2-b7ed-afc3825ff4de"
+}

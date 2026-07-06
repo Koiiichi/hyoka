@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783305261.3818474,
+            "stop": 1783305261.3903134
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.00035433399898465723,
+                "start": 1783305261.3853083,
+                "stop": 1783305261.3858087,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0003978320019086823,
+                "start": 1783305261.3859093,
+                "stop": 1783305261.3902662,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffffb4245760>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is one process that establishes Run-key persistence (a registry value \"\n            \"under CurrentVersion\\\\Run pointing at encoded PowerShell) and then beacons to a C2 host; \"\n            \"flag exactly that process's persistence write and its C2 network connections \"\n            \"(over-flagging benign activity destroys precision, and flagging only the obvious Run-key \"\n            \"write while missing the beaconing destroys recall).\"\n        )\nE       AssertionError: F1=0.068 (precision=0.035, recall=1.000); flagged 314 events, 11 of 11 malicious. The intrusion is one process that establishes Run-key persistence (a registry value under CurrentVersion\\Run pointing at encoded PowerShell) and then beacons to a C2 host; flag exactly that process's persistence write and its C2 network connections (over-flagging benign activity destroys precision, and flagging only the obvious Run-key write while missing the beaconing destroys recall).\nE       assert 0.06769230769230769 >= 0.99\n\ntest_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

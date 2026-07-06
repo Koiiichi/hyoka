@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/run-key-hunt"
+    },
+    "trial_name": "run-key-hunt__5Hfft65",
+    "trials_dir": "jobs/batch_1783305091/trial_4/2026-07-05__22-31-32",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "56b8956d-b66b-4d88-83d8-7376ac4abb43"
+}

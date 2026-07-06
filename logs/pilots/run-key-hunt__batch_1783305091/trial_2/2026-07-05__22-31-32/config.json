@@ -1,0 +1,15 @@
+{
+    "jobs_dir": "jobs/batch_1783305091/trial_2",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/run-key-hunt"
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+schema_version = "1.3"
+
+# Collected from the agent container and re-materialized at its original path
+# inside the separate verifier container (/root/findings.json).
+artifacts = ["/root/findings.json"]
+
+[task]
+name = "abundant-cyber-eval/account-enumeration-hunt"
+description = "Threat-hunt a SQLite database of real Windows Sysmon + Security logs (two real Empire account/group enumeration recordings from OTRF Security-Datasets, deterministically time-shifted and entity-obfuscated) with no hints, and flag the cross-source account-discovery activity. Scored by F1 against Sigma/behaviour-derived ground truth."
+
+[metadata]
+author_name = "Muneeb Hassan"
+author_email = "m57hassa@uwaterloo.ca"
+category = "detection-engineering"
+tags = ["cybersecurity", "soc", "threat-hunting", "discovery", "account-enumeration", "sysmon", "mitre-attack"]
+expert_time_estimate_hours = 1.0
+difficulty_explanation = "Confirmed OTRF template (arXiv 2604.19533). Sources: empire_shell_net_localgroup_administrators + empire_shell_net_local_users, combined into one campaign. Account/group discovery leaves evidence split across two log sources: the reconnaissance commands (Sysmon 1, net.exe/net1.exe with localgroup/user/group arguments) and the Windows Security membership-enumeration audit (4798/4799). Ground truth is the union of both. This is deliberately cross-source: flag-net.exe-only captures the Sysmon side but misses every Security 4798/4799 event, and flagging the Security events misses the recon commands; flag-all-process-creation and flag-all-powershell drown in benign volume. Discovery telemetry is low-signal and interleaved with high-volume Sysmon/PowerShell logging, so the malicious subset is a small fraction requiring correlation across Sysmon + Security. The professional who does this is a SOC threat hunter / detection engineer triaging raw endpoint telemetry. Objective F1 vs behaviour-derived ground truth. Data: OTRF Security-Datasets (GPL-3.0), vendored + obfuscated; source generator/labels stripped from the runtime image."
+solution_explanation = "The account-discovery footprint spans two log sources and must be unioned. First take every Windows Security membership-enumeration audit event (EventID 4798 = a user's local group membership was enumerated, 4799 = a security-enabled local group's membership was enumerated). Then add the Sysmon process creations (EventID 1) whose image is net.exe or net1.exe and whose command line contains a recon verb (localgroup / user / group). The union of those two sets is the answer. The key insight is that neither source alone is complete — the recon commands and the audit events record different facets of the same behaviour — so the solver must correlate across Sysmon and Security rather than filter one channel; ~15 lines of SQL express this directly."
+verification_explanation = "The verifier reads the agent's /root/findings.json (collected as a declared artifact), parses it as a JSON list of event_id strings (dict items keyed event_id/id/eventid are also accepted), and computes precision, recall, and F1 by exact set arithmetic against tests/ground_truth.json, which is baked into the verifier image and never enters the agent container. The task passes iff F1 >= 0.99. With 14 ground-truth events this threshold is effectively exact-match and is not a fuzzy tolerance: a single spurious flag drops precision to 14/15 (F1 0.966) and a single miss drops recall to 13/14 (F1 0.963), both below 0.99, so 0.99 admits only the perfect set while sidestepping any floating-point edge of a literal == 1.0 comparison. reward.txt records the fractional F1 as a continuous signal."
+
+[verifier]
+timeout_sec = 300.0
+environment_mode = "separate"
+
+[agent]
+timeout_sec = 3600.0
+
+[environment]
+allow_internet = true
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 2048

@@ -1,0 +1,38 @@
+Threat-hunt F1 (reward): 0.3125
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collecting ... collected 2 items
+
+test_outputs.py::TestThreatHunt::test_findings_present PASSED            [ 50%]
+test_outputs.py::TestThreatHunt::test_identifies_intrusion FAILED        [100%]
+
+=================================== FAILURES ===================================
+___________________ TestThreatHunt.test_identifies_intrusion ___________________
+
+self = <test_outputs.TestThreatHunt object at 0xffff9f4fbda0>
+
+    def test_identifies_intrusion(self):
+        submitted = load_findings()
+        truth = load_truth()
+        precision, recall, f1 = score(submitted, truth)
+>       assert f1 >= PASS_F1, (
+            f"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged "
+            f"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. "
+            "The intrusion is a script-host execution chain: a VBScript run by wscript/cscript "
+            "spawns a PowerShell stager whose process tree runs discovery and beacons out; flag "
+            "exactly that tree's process creations and network connections (over-flagging benign "
+            "activity destroys precision, and missing the spawned shell, its children, or the "
+            "network beacon destroys recall)."
+        )
+E       AssertionError: F1=0.312 (precision=0.185, recall=1.000); flagged 27 events, 5 of 5 malicious. The intrusion is a script-host execution chain: a VBScript run by wscript/cscript spawns a PowerShell stager whose process tree runs discovery and beacons out; flag exactly that tree's process creations and network connections (over-flagging benign activity destroys precision, and missing the spawned shell, its children, or the network beacon destroys recall).
+E       assert 0.3125 >= 0.99
+
+test_outputs.py:55: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED test_outputs.py::TestThreatHunt::test_findings_present
+FAILED test_outputs.py::TestThreatHunt::test_identifies_intrusion - Assertion...
+========================= 1 failed, 1 passed in 0.01s ==========================

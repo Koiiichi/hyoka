@@ -7,7 +7,7 @@
 
 <br>
 
-An open-ended SOC threat-hunting evaluation for `gemini-3.5-flash`, built on real Windows attack telemetry from OTRF Security-Datasets, scored by F1 against Sigma/behaviour-derived ground truth. **0% pass@3 on every task.** Aggregate mean F1 = 0.119 across 35 trials.
+An open-ended SOC threat-hunting evaluation for `gemini-3.5-flash`, built on real Windows attack telemetry from OTRF Security-Datasets, scored by F1 against Sigma/behaviour-derived ground truth. **0% pass@3 on every task.** Aggregate mean F1 = 0.149 across 35 trials.
 
 ---
 
@@ -32,13 +32,13 @@ python3 report/build_report.py   # writes report/report.html + report/report.pdf
 ```
 hyōka/
 ├── samples/                    # ← the deliverable: 7 fully-built Harbor tasks
-│   ├── threat-hunt-windows-eventlogs/
-│   ├── lateral-movement-psexec-hunt/
-│   ├── persistence-run-key-hunt/
-│   ├── discovery-account-enum-hunt/
-│   ├── execution-vbs-launcher-hunt/
-│   ├── defense-evasion-injection-hunt/
-│   └── privesc-uac-bypass-hunt/
+│   ├── credential-dump-hunt/
+│   ├── psexec-lateral-hunt/
+│   ├── run-key-hunt/
+│   ├── account-enumeration-hunt/
+│   ├── vbs-launcher-hunt/
+│   ├── lolbin-injection-hunt/
+│   └── uac-bypass-hunt/
 │       ├── instruction.md          # agent-facing, no ground-truth leak
 │       ├── task.toml               # Harbor schema 1.3
 │       ├── environment/
@@ -53,8 +53,7 @@ hyōka/
 │       │   ├── score_reward.py     # standalone reward printer
 │       │   └── ground_truth.json   # hidden event-id set (never shipped in image)
 │       └── solution/
-│           ├── solve.sh            # real oracle (genuine detection logic)
-│           └── lazy_baselines/     # adversarial dumb-solver battery (QA gate)
+│           └── solve.sh            # real oracle (genuine detection logic)
 │
 ├── logs/
 │   └── pilots/                 # ← the 7 pilot batches (5 trials each, 35 total)
@@ -71,6 +70,7 @@ hyōka/
 │   ├── run_trials.sh           # launches N parallel harbor runs
 │   ├── parse_results.py        # aggregates pass@k from a batch directory
 │   ├── lazy_baseline_probe.py  # QA gate: proves lazy baselines fail
+│   ├── lazy_baselines/         # per-task dumb-solver battery (dev/QA, not shipped in tasks)
 │   └── scratchpad_init.py
 │
 ├── assets/                     # hyōka visual identity
@@ -103,13 +103,13 @@ hyōka/
 
 | Task | ATT&CK tactic | OTRF source | GT events | mean F1 |
 |---|---|---|---|---|
-| threat-hunt-windows-eventlogs | Credential access + C2 | empire_mimikatz_logonpasswords | 37 | 0.132 |
-| lateral-movement-psexec-hunt | Lateral movement | empire_psexec_dcerpc_tcp_svcctl | 4 | 0.199 |
-| persistence-run-key-hunt | Persistence | empire_persistence_registry_run_keys | 11 | 0.069 |
-| discovery-account-enum-hunt | Discovery | empire net_localgroup + net_local_users | 14 | 0.021 |
-| execution-vbs-launcher-hunt | Execution | empire_launcher_vbs | 5 | 0.144 |
-| defense-evasion-injection-hunt | Defense evasion | covenant_lolbin_wuauclt_createremotethread | 3 | 0.106 |
-| privesc-uac-bypass-hunt | Privilege escalation | empire_uac_shellapi_fodhelper | 7 | 0.164 |
+| credential-dump-hunt | Credential access + C2 | empire_mimikatz_logonpasswords | 37 | 0.069 |
+| psexec-lateral-hunt | Lateral movement | empire_psexec_dcerpc_tcp_svcctl | 4 | 0.227 |
+| run-key-hunt | Persistence | empire_persistence_registry_run_keys | 11 | 0.069 |
+| account-enumeration-hunt | Discovery | empire net_localgroup + net_local_users | 14 | 0.079 |
+| vbs-launcher-hunt | Execution | empire_launcher_vbs | 5 | 0.230 |
+| lolbin-injection-hunt | Defense evasion | covenant_lolbin_wuauclt_createremotethread | 3 | 0.104 |
+| uac-bypass-hunt | Privilege escalation | empire_uac_shellapi_fodhelper | 7 | 0.266 |
 
 Data: [OTRF Security-Datasets](https://github.com/OTRF/Security-Datasets) (GPL-3.0),
 deterministically time-shifted and entity-obfuscated. Ground truth from

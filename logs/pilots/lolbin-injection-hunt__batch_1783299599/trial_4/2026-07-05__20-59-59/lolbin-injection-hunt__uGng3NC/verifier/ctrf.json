@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783299957.2567172,
+            "stop": 1783299957.2648625
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.0002930000046035275,
+                "start": 1783299957.2602198,
+                "stop": 1783299957.260652,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.00029420699866022915,
+                "start": 1783299957.2607703,
+                "stop": 1783299957.2648213,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffff8a90bda0>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is one process-injection chain: a LOLBin process loads a DLL from \"\n            \"outside the Windows directory and injects into another process via CreateRemoteThread; \"\n            \"flag exactly its malicious events (over-flagging benign activity destroys precision, \"\n            \"and missing any of the process-creation, DLL-load, or injection events destroys recall).\"\n        )\nE       AssertionError: F1=0.057 (precision=0.029, recall=1.000); flagged 102 events, 3 of 3 malicious. The intrusion is one process-injection chain: a LOLBin process loads a DLL from outside the Windows directory and injects into another process via CreateRemoteThread; flag exactly its malicious events (over-flagging benign activity destroys precision, and missing any of the process-creation, DLL-load, or injection events destroys recall).\nE       assert 0.05714285714285715 >= 0.99\n\ntest_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

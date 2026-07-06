@@ -1,0 +1,38 @@
+Threat-hunt F1 (reward): 0.3889
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collecting ... collected 2 items
+
+test_outputs.py::TestThreatHunt::test_findings_present PASSED            [ 50%]
+test_outputs.py::TestThreatHunt::test_identifies_intrusion FAILED        [100%]
+
+=================================== FAILURES ===================================
+___________________ TestThreatHunt.test_identifies_intrusion ___________________
+
+self = <test_outputs.TestThreatHunt object at 0xffff9068bda0>
+
+    def test_identifies_intrusion(self):
+        submitted = load_findings()
+        truth = load_truth()
+        precision, recall, f1 = score(submitted, truth)
+>       assert f1 >= PASS_F1, (
+            f"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged "
+            f"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. "
+            "The intrusion is a fodhelper UAC bypass: a hijack of the HKCU ms-settings\\Shell\\Open\\command "
+            "registry key (Sysmon 12/13) pointing at encoded PowerShell, the auto-elevating fodhelper.exe "
+            "launch (Sysmon 1), and the elevated child it spawns; flag exactly those (over-flagging benign "
+            "activity destroys precision, and flagging only the fodhelper launch while missing the registry "
+            "hijack or the elevated child destroys recall)."
+        )
+E       AssertionError: F1=0.389 (precision=0.241, recall=1.000); flagged 29 events, 7 of 7 malicious. The intrusion is a fodhelper UAC bypass: a hijack of the HKCU ms-settings\Shell\Open\command registry key (Sysmon 12/13) pointing at encoded PowerShell, the auto-elevating fodhelper.exe launch (Sysmon 1), and the elevated child it spawns; flag exactly those (over-flagging benign activity destroys precision, and flagging only the fodhelper launch while missing the registry hijack or the elevated child destroys recall).
+E       assert 0.3888888888888889 >= 0.99
+
+test_outputs.py:55: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED test_outputs.py::TestThreatHunt::test_findings_present
+FAILED test_outputs.py::TestThreatHunt::test_identifies_intrusion - Assertion...
+========================= 1 failed, 1 passed in 0.01s ==========================

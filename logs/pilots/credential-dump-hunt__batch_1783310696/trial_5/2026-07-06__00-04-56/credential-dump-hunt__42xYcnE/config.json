@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/credential-dump-hunt"
+    },
+    "trial_name": "credential-dump-hunt__42xYcnE",
+    "trials_dir": "jobs/batch_1783310696/trial_5/2026-07-06__00-04-56",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "2d686a02-aeb2-4a90-9c0d-34ad25a78216"
+}

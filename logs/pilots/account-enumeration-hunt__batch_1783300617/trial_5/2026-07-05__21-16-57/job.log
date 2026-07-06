@@ -1,0 +1,167 @@
+Skipping image OS validation for hb__3cf1ea9cbdbb7912bc7d68c49b6b42b4: docker inspect returned 1
+Installing: tmux, asciinema
+Detected system: {'os': 'debian-based', 'package_manager': 'apt-get', 'update_command': None}
+Installing tools using apt-get: DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tmux asciinema
+Starting recording.
+Sending keys: ['asciinema rec --stdin /logs/agent/recording.cast', 'Enter'] min_timeout_sec: 1.0 max_timeout_sec: 180.0
+Sending keys: ['clear', 'Enter'] min_timeout_sec: 0.0 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db ".schema events"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT host, COUNT(*) FROM events GROUP BY host;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events GROUP BY event_code ORDER BY COUNT(*) DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, message FROM events WHERE event_code IN (800, 4103) LIMIT 20;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ["echo 'SQBGACgAJABQAFMAVgBlAFIAcwBpAE8ATgBUAEEAQgBMAGUALgBQAFMAVgBlAHIAUwBJAE8ATgAuAE0AQQBKAG8AUgAgAC0ARwBFACAAMwApAHsAJABDADMAMgAyAD0AWwByAGUAZgBdAC4AQQBzAHMARQBNAEIAbABZAC4ARwBlAHQAVAB5AHAARQAoACcAUwB5AHMAdABlAG0ALgBNAGEAbgBhAGcAZQBtAGUAbgB0AC4AQQB1AHQAbwBtAGEAdABpAG8AbgAuAFUAdABpAGwAcwAnACkALgAiAEcARQB0AEYAaQBFAGAAbABkACIAKAAnAGMAYQBjAGgAZQBkAEcAcgBvAHUAcABQAG8AbABpAGMAeQBTAGUAdABpAG4AZwBzACcALAAnAE4AJwArACcAbwBuAFAAdQBiAGwAaQBjACwAUwB0AGEAdABpAGMAJwApADsASQBGAChAJABDADMAMgAyACkAewAkAGMANwA0ADIAPQAkAEMAMwAyADIALgBHAGUAdABWAEEAbABVAGUAKAAkAG4AdQBsAEwAKQA7AEkARgAoACQAYwA3ADQAMgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdACkAewAkAEMANwA0ADIAWwAnAFMAYwByAGkAcAB0AEIAJwArACcAbABvAGMAawBMAG8AZwBnAGkAbgBnACcAXQBbACcARQBuAGEAYgBsAGUAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAD0AMAA7ACQAQwA3ADQAMgBbACcAUwBjAHIAaQBwAHQAQgAnACsAJwBsAG8AYwBrAEwAbwBnAGcAaQBuAGcAJwBdAFsAJwBFAG4AYQBiAGwAZQBTAEMAcgBpAHAAdABCAGwAbwBjAGsASQBuAHYAbwBjAGEAdABpAG8AbgBMAG8AZwBnAGkAbgBnACcALQAw' | base64 -d | iconv -f UTF-16LE -t UTF-8\n"] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, parent_image, command_line FROM events WHERE (user LIKE \'%m.ward%\' OR host = \'WS-05.corp.example\') AND event_code IN (1, 4688) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, host, user, image, parent_image, command_line FROM events WHERE event_code IN (1, 4688) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' GROUP BY event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, command_line, src_ip, dst_ip, dst_port, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (3, 11, 17, 18, 22) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT host, src_ip, dst_ip, COUNT(*) FROM events WHERE event_code IN (3, 5156, 5158) GROUP BY host, src_ip, dst_ip;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, target_image, granted_access FROM events WHERE event_code = 10 AND host = \'WS-05.corp.example\' LIMIT 50;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'WS-06.corp.example\' GROUP BY event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, command_line, src_ip, dst_ip, dst_port, details FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (3, 11, 18, 22) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, details, message FROM events WHERE event_id IN (\'evt-01589\', \'evt-02043\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE event_id IN (\'evt-01589\', \'evt-02043\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-01589\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE host = \'DC01.corp.example\' GROUP BY event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, target_user, logon_type, src_ip FROM events WHERE event_code = 4624 ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, event_code, user, target_user, details, message FROM events WHERE host = \'DC01.corp.example\' AND event_code IN (5140, 5145) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE event_id IN (\'evt-01768\', \'evt-01769\', \'evt-01774\', \'evt-01779\', \'evt-01790\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-01768\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, target_user, details FROM events WHERE host = \'DC01.corp.example\' AND event_code NOT IN (5156, 5158, 5858) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-01816\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, host, user, target_user, details, message FROM events WHERE message LIKE \'%1113%\' OR details LIKE \'%1113%\' LIMIT 10;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, parent_image, command_line, details FROM events WHERE host = \'WS-06.corp.example\' AND timestamp >= \'2026-05-06T00:08:10.000Z\' AND timestamp <= \'2026-05-06T00:08:30.000Z\' AND event_code NOT IN (7, 10) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT image, target_image, granted_access, COUNT(*) FROM events WHERE host = \'WS-06.corp.example\' AND event_code = 10 GROUP BY image, target_image, granted_access ORDER BY COUNT(*) DESC;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, src_ip, dst_ip, dst_port FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (3, 5156, 5158) AND timestamp >= \'2026-05-06T00:08:10.000Z\' AND timestamp <= \'2026-05-06T00:08:20.000Z\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id IN (\'evt-01298\', \'evt-01299\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE event_id BETWEEN \'evt-01529\' AND \'evt-01539\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 800 AND message NOT LIKE \'%SQBGACgAJABQAFMAVgBlAFIAcwBpAE8ATgBUAEEAQgBMAGUALgBQAFMAVg%\' ORDER BY timestamp LIMIT 20;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT SUBSTR(message, 1, 150), COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 800 GROUP BY SUBSTR(message, 1, 150);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT SUBSTR(message, 1, INSTR(message, \'Context Information\') - 1) AS cmd FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 800;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, src_ip, dst_ip, dst_port, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (3, 5156, 5158) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE event_id IN (\'evt-01296\', \'evt-01297\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 5156 AND message NOT LIKE \'%168.63.129.16%\' AND message NOT LIKE \'%52.114.158.53%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT user FROM events WHERE host = \'WS-06.corp.example\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, target_object, details FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (12, 13) AND target_object LIKE \'%wbem%\' ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, host, user, image, parent_image, command_line FROM events WHERE parent_image LIKE \'%WmiPrvSE.exe%\' AND event_code IN (1, 4688);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, user, image, parent_image, command_line, details FROM events WHERE host = \'WS-05.corp.example\' AND timestamp >= \'2026-05-06T00:08:15.000Z\' AND timestamp <= \'2026-05-06T00:08:25.000Z\' AND event_code NOT IN (7, 10) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, message FROM events WHERE event_id BETWEEN \'evt-01542\' AND \'evt-01552\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, SUBSTR(message, 1, INSTR(message, \'Context Information\') - 1) FROM events WHERE event_id BETWEEN \'evt-01542\' AND \'evt-01552\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, message FROM events WHERE host = \'WS-06.corp.example\' AND event_code IN (4798, 4799) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (800, 4103) AND (message LIKE \'%localgroup%\' OR message LIKE \'%user%\') ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, SUBSTR(message, 1, 100) FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (800, 4103) AND (message LIKE \'%localgroup%\' OR message LIKE \'%net1%\') ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, event_code, SUBSTR(message, 1, 100) FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (800, 4103) AND (message LIKE \'%net%\') ORDER BY timestamp LIMIT 20;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT min(timestamp), max(timestamp), count(*) FROM events;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT process_guid, image, command_line FROM events WHERE host = \'WS-05.corp.example\' AND (image LIKE \'%powershell%\' OR parent_image LIKE \'%powershell%\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_code, COUNT(*) FROM events WHERE process_guid = \'{b34bc01c-2f95-5f69-5f01-000000000900}\' GROUP BY event_code;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image, target_image FROM events WHERE (process_guid = \'{b34bc01c-2f95-5f69-5f01-000000000900}\' OR details LIKE \'%{b34bc01c-2f95-5f69-5f01-000000000900}%\' OR message LIKE \'%{b34bc01c-2f95-5f69-5f01-000000000900}%\');"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT DISTINCT SUBSTR(message, INSTR(message, \'HostApplication=\'), 100) FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (800, 4103);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-00922\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, host, timestamp, message, details FROM events WHERE event_code = 22;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, image, process_guid FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 5 ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4689 ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 4799;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT image, COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 7 GROUP BY image;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 7 AND image LIKE \'%svchost%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, image, target_object, details FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 11;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT image, COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (12, 13) GROUP BY image;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (12, 13) AND image LIKE \'%powershell.exe%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, image FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (17, 18);"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT image, target_image, COUNT(*) FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 10 GROUP BY image, target_image;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, timestamp, image, target_image FROM events WHERE host = \'WS-05.corp.example\' AND event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\') ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, user, target_user, details, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (4656, 4658, 4663, 4690) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, user, message FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (4656, 4658, 4663, 4690) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE host = \'WS-05.corp.example\' AND event_code IN (4656, 4658, 4663, 4690) ORDER BY timestamp;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id FROM events WHERE host = \'DC01.corp.example\' AND event_code = 16968;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT host, count(*) FROM events WHERE message LIKE \'%theshire%\' OR details LIKE \'%theshire%\' GROUP BY host;"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, message, details FROM events WHERE message LIKE \'%theshire%\' OR details LIKE \'%theshire%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT event_id, event_code, details FROM events WHERE message LIKE \'%theshire%\' OR details LIKE \'%theshire%\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "\nSELECT event_id FROM events \nWHERE host = \'WS-05.corp.example\' \nAND (\n  event_code IN (800, 4103, 4799) \n  OR (event_code IN (1, 5, 4688, 4689) AND (image LIKE \'%net.exe%\' OR image LIKE \'%net1.exe%\' OR command_line LIKE \'%net%\'))\n  OR (event_code = 7 AND NOT image LIKE \'%svchost%\')\n  OR (event_code IN (12, 13) AND image LIKE \'%powershell.exe%\')\n  OR (event_code IN (17, 18) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%net1.exe%\'))\n  OR (event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\'))\n  OR (event_code IN (4656, 4658, 4663, 4690))\n);\n" | wc -l\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "\nSELECT event_id, event_code, image, command_line FROM events \nWHERE host = \'WS-05.corp.example\' \nAND (\n  event_code IN (800, 4103, 4799) \n  OR (event_code IN (1, 5, 4688, 4689) AND (image LIKE \'%net.exe%\' OR image LIKE \'%net1.exe%\' OR command_line LIKE \'%net%\'))\n  OR (event_code = 7 AND NOT image LIKE \'%svchost%\')\n  OR (event_code IN (12, 13) AND image LIKE \'%powershell.exe%\')\n  OR (event_code IN (17, 18) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%net1.exe%\'))\n  OR (event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\'))\n  OR (event_code IN (4656, 4658, 4663, 4690))\n) AND event_code = 4689;\n"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "SELECT * FROM events WHERE event_id = \'evt-00184\';"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "\nSELECT event_id FROM events \nWHERE host = \'WS-05.corp.example\' \nAND (\n  event_code IN (800, 4103, 4799) \n  OR (event_code IN (1, 5, 4688, 4689) AND (image LIKE \'%net.exe%\' OR image LIKE \'%net1.exe%\' OR command_line LIKE \'%net%\' OR message LIKE \'%net.exe%\' OR message LIKE \'%net1.exe%\'))\n  OR (event_code = 7 AND NOT image LIKE \'%svchost%\')\n  OR (event_code IN (12, 13) AND image LIKE \'%powershell.exe%\')\n  OR (event_code IN (17, 18) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%net1.exe%\'))\n  OR (event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\'))\n  OR (event_code IN (4656, 4658, 4663, 4690))\n) AND event_code = 4689;\n"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['sqlite3 /root/data/eventlogs.db "\nSELECT COUNT(event_id) FROM events \nWHERE host = \'WS-05.corp.example\' \nAND (\n  event_code IN (800, 4103, 4799) \n  OR (event_code IN (1, 5, 4688, 4689) AND (image LIKE \'%net.exe%\' OR image LIKE \'%net1.exe%\' OR command_line LIKE \'%net%\' OR message LIKE \'%net.exe%\' OR message LIKE \'%net1.exe%\'))\n  OR (event_code = 7 AND NOT image LIKE \'%svchost%\')\n  OR (event_code IN (12, 13) AND image LIKE \'%powershell.exe%\')\n  OR (event_code IN (17, 18) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%net1.exe%\'))\n  OR (event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\'))\n  OR (event_code IN (4656, 4658, 4663, 4690))\n);\n"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['python3 -c "\nimport sqlite3\nimport json\n\nconn = sqlite3.connect(\'/root/data/eventlogs.db\')\ncursor = conn.cursor()\n\nquery = \\"\\"\\"\nSELECT event_id FROM events \nWHERE host = \'WS-05.corp.example\' \nAND (\n  event_code IN (800, 4103, 4799) \n  OR (event_code IN (1, 5, 4688, 4689) AND (image LIKE \'%net.exe%\' OR image LIKE \'%net1.exe%\' OR command_line LIKE \'%net%\' OR message LIKE \'%net.exe%\' OR message LIKE \'%net1.exe%\'))\n  OR (event_code = 7 AND NOT image LIKE \'%svchost%\')\n  OR (event_code IN (12, 13) AND image LIKE \'%powershell.exe%\')\n  OR (event_code IN (17, 18) AND (image LIKE \'%powershell.exe%\' OR image LIKE \'%net1.exe%\'))\n  OR (event_code = 10 AND NOT (image LIKE \'%svchost.exe%\' AND target_image LIKE \'%svchost.exe%\'))\n  OR (event_code IN (4656, 4658, 4663, 4690))\n);\n\\"\\"\\"\n\ncursor.execute(query)\nrows = cursor.fetchall()\nevent_ids = [row[0] for row in rows]\n\nwith open(\'/root/findings.json\', \'w\') as f:\n    json.dump(event_ids, f)\n\nprint(f\'Wrote {len(event_ids)} event IDs to /root/findings.json\')\n"\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Sending keys: ['head -c 200 /root/findings.json && echo\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Sending keys: ['tail -c 200 /root/findings.json && echo\n'] min_timeout_sec: 0.5 max_timeout_sec: 180.0
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Trajectory dumped to jobs/batch_1783300617/trial_5/2026-07-05__21-16-57/account-enumeration-hunt__7nzy4qV/agent/trajectory.json
+Collecting main service artifacts
+Skipping image OS validation for hb__24c164e7403779db4641643bb1261c3b: docker inspect returned 1

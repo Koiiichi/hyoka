@@ -1,0 +1,41 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 2,
+            "passed": 1,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1783300909.9275298,
+            "stop": 1783300909.9352863
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_findings_present",
+                "status": "passed",
+                "duration": 0.00029754200659226626,
+                "start": 1783300909.93084,
+                "stop": 1783300909.9313061,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::TestThreatHunt::test_identifies_intrusion",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0003022089949809015,
+                "start": 1783300909.9313984,
+                "stop": 1783300909.9352481,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "self = <test_outputs.TestThreatHunt object at 0xffff97cafaa0>\n\n    def test_identifies_intrusion(self):\n        submitted = load_findings()\n        truth = load_truth()\n        precision, recall, f1 = score(submitted, truth)\n>       assert f1 >= PASS_F1, (\n            f\"F1={f1:.3f} (precision={precision:.3f}, recall={recall:.3f}); flagged \"\n            f\"{len(submitted)} events, {len(submitted & truth)} of {len(truth)} malicious. \"\n            \"The intrusion is a cross-source account/group discovery campaign: net.exe/net1.exe \"\n            \"reconnaissance commands (Sysmon) plus the Windows Security membership-enumeration audit \"\n            \"events (4798/4799) that record the same behaviour in a different log; flag exactly those \"\n            \"(over-flagging benign activity destroys precision, and catching the activity in only one \"\n            \"log source destroys recall).\"\n        )\nE       AssertionError: F1=0.323 (precision=0.294, recall=0.357); flagged 17 events, 5 of 14 malicious. The intrusion is a cross-source account/group discovery campaign: net.exe/net1.exe reconnaissance commands (Sysmon) plus the Windows Security membership-enumeration audit events (4798/4799) that record the same behaviour in a different log; flag exactly those (over-flagging benign activity destroys precision, and catching the activity in only one log source destroys recall).\nE       assert 0.3225806451612903 >= 0.99\n\ntest_outputs.py:55: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

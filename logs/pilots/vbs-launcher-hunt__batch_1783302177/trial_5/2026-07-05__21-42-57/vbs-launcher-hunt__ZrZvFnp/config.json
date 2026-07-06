@@ -1,0 +1,12 @@
+{
+    "task": {
+        "path": "samples/vbs-launcher-hunt"
+    },
+    "trial_name": "vbs-launcher-hunt__ZrZvFnp",
+    "trials_dir": "jobs/batch_1783302177/trial_5/2026-07-05__21-42-57",
+    "agent": {
+        "name": "terminus-2",
+        "model_name": "gemini/gemini-3.5-flash"
+    },
+    "job_id": "24532f21-7ffd-4c82-b0ad-cbb6f428dac7"
+}

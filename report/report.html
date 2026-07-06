@@ -118,11 +118,11 @@ ul.tight li{margin:6px 0;}
 <div class="meta"><span><b>Author</b> Muneeb Hassan</span><span><b>Model under test</b> gemini/gemini-3.5-flash (terminus-2)</span><span><b>Tasks</b> 7</span><span><b>Trials</b> 35 (5 / task)</span><span><b>Date</b> 2026-07-05</span></div>
 
 <div class="abstract"><div class="lab">Abstract</div>
-<p>Hyōka measures whether an LLM agent can perform the core, unautomated job of a SOC analyst: given a database of raw Windows event logs and <b>no hints</b>, identify the exact events that make up an intrusion. Each of the seven tasks wraps a real attack recording from the OTRF Security-Datasets corpus, deterministically time-shifted and entity-obfuscated into a queryable SQLite database, with ground truth derived from the corresponding Sigma detection rule and scored by F1. Against gemini-3.5-flash the suite is decisively hard: <b>0% pass@3 on every task</b>, aggregate mean F1 0.119 over 35 trials, while the oracle solver scores 1.000 and the no-op agent 0.000 throughout. The failures are genuine and uniform — the model reliably <i>locates</i> the malicious activity (recall ≈ 1.0) but cannot <i>scope</i> it, flagging up to 4,886 events for a 37-event answer. We situate the design in the recent literature (notably the <a href="https://arxiv.org/abs/2604.19533">Cyber Defense Benchmark</a> and <a href="https://arxiv.org/abs/2603.13517">CTI-REALM</a>), give a concrete 10→1,000 scaling plan, and document the deliberate pivot away from hand-authored synthetic tasks, which the model solved at 93–100% pass@3.</p></div>
+<p>Hyōka measures whether an LLM agent can perform the core, unautomated job of a SOC analyst: given a database of raw Windows event logs and <b>no hints</b>, identify the exact events that make up an intrusion. Each of the seven tasks wraps a real attack recording from the OTRF Security-Datasets corpus, deterministically time-shifted and entity-obfuscated into a queryable SQLite database, with ground truth derived from the corresponding Sigma detection rule and scored by F1. Against gemini-3.5-flash the suite is decisively hard: <b>0% pass@3 on every task</b>, aggregate mean F1 0.149 over 35 trials, while the oracle solver scores 1.000 and the no-op agent 0.000 throughout. The failures are genuine and uniform — the model reliably <i>locates</i> the malicious activity (recall ≈ 1.0) but cannot <i>scope</i> it, flagging up to 4,871 events for a 37-event answer. We situate the design in the recent literature (notably the <a href="https://arxiv.org/abs/2604.19533">Cyber Defense Benchmark</a> and <a href="https://arxiv.org/abs/2603.13517">CTI-REALM</a>), give a concrete 10→1,000 scaling plan, and document the deliberate pivot away from hand-authored synthetic tasks, which the model solved at 93–100% pass@3.</p></div>
 
 <div class="metrics">
 <div class="metric"><div class="v">0%</div><div class="l">pass@3 · every task</div></div>
-<div class="metric"><div class="v">0.119</div><div class="l">aggregate mean F1</div></div>
+<div class="metric"><div class="v">0.149</div><div class="l">aggregate mean F1</div></div>
 <div class="metric"><div class="v">1.00 / 0.00</div><div class="l">oracle / nop reward</div></div>
 <div class="metric"><div class="v">7</div><div class="l">ATT&amp;CK tactics</div></div>
 </div>
@@ -147,27 +147,27 @@ ul.tight li{margin:6px 0;}
 <p>Each task is built from a real attack recording in the <b><a href="https://github.com/OTRF/Security-Datasets">OTRF Security-Datasets</a></b> corpus (the Open Threat Research "Mordor" project): genuine Empire, Covenant, Mimikatz, and PurpleSharp campaigns captured as Windows event logs on instrumented hosts. A deterministic builder time-shifts every timestamp into a common window and consistently rewrites host, domain, and user identifiers, so the environment is reproducible on each container build yet is not the verbatim, memorizable public file. Ground truth is derived from the technique's <b><a href="https://github.com/SigmaHQ/sigma">Sigma / behavioural detection rule</a></b> — the same labelling methodology as the <a href="https://arxiv.org/abs/2604.19533">Cyber Defense Benchmark</a> (§3) — and never hand-curated per event. The seven tasks span seven MITRE ATT&amp;CK tactics:</p>
 
 <table><thead><tr><th>Task</th><th>Tactic</th><th>OTRF source recording</th><th class="m">Malicious</th></tr></thead>
-<tbody><tr><td>threat-hunt-windows-eventlogs</td><td>Credential access + C2<br><span class='dim'>T1003 / T1071</span></td><td><span class='dim'>empire_mimikatz_logonpasswords</span></td><td class='m'>37</td></tr>
-<tr><td>lateral-movement-psexec-hunt</td><td>Lateral movement<br><span class='dim'>T1021.002 / T1543</span></td><td><span class='dim'>empire_psexec_dcerpc_tcp_svcctl</span></td><td class='m'>4</td></tr>
-<tr><td>persistence-run-key-hunt</td><td>Persistence<br><span class='dim'>T1547.001</span></td><td><span class='dim'>empire_persistence_registry_run_keys</span></td><td class='m'>11</td></tr>
-<tr><td>discovery-account-enum-hunt</td><td>Discovery<br><span class='dim'>T1069 / T1087</span></td><td><span class='dim'>empire net_localgroup + net_local_users</span></td><td class='m'>14</td></tr>
-<tr><td>execution-vbs-launcher-hunt</td><td>Execution<br><span class='dim'>T1059</span></td><td><span class='dim'>empire_launcher_vbs</span></td><td class='m'>5</td></tr>
-<tr><td>defense-evasion-injection-hunt</td><td>Defense evasion<br><span class='dim'>T1055 / T1218</span></td><td><span class='dim'>covenant_lolbin_wuauclt_createremotethread</span></td><td class='m'>3</td></tr>
-<tr><td>privesc-uac-bypass-hunt</td><td>Privilege escalation<br><span class='dim'>T1548.002</span></td><td><span class='dim'>empire_uac_shellapi_fodhelper</span></td><td class='m'>7</td></tr></tbody></table>
+<tbody><tr><td>credential-dump-hunt</td><td>Credential access + C2<br><span class='dim'>T1003 / T1071</span></td><td><span class='dim'>empire_mimikatz_logonpasswords</span></td><td class='m'>37</td></tr>
+<tr><td>psexec-lateral-hunt</td><td>Lateral movement<br><span class='dim'>T1021.002 / T1543</span></td><td><span class='dim'>empire_psexec_dcerpc_tcp_svcctl</span></td><td class='m'>4</td></tr>
+<tr><td>run-key-hunt</td><td>Persistence<br><span class='dim'>T1547.001</span></td><td><span class='dim'>empire_persistence_registry_run_keys</span></td><td class='m'>11</td></tr>
+<tr><td>account-enumeration-hunt</td><td>Discovery<br><span class='dim'>T1069 / T1087</span></td><td><span class='dim'>empire net_localgroup + net_local_users</span></td><td class='m'>14</td></tr>
+<tr><td>vbs-launcher-hunt</td><td>Execution<br><span class='dim'>T1059</span></td><td><span class='dim'>empire_launcher_vbs</span></td><td class='m'>5</td></tr>
+<tr><td>lolbin-injection-hunt</td><td>Defense evasion<br><span class='dim'>T1055 / T1218</span></td><td><span class='dim'>covenant_lolbin_wuauclt_createremotethread</span></td><td class='m'>3</td></tr>
+<tr><td>uac-bypass-hunt</td><td>Privilege escalation<br><span class='dim'>T1548.002</span></td><td><span class='dim'>empire_uac_shellapi_fodhelper</span></td><td class='m'>7</td></tr></tbody></table>
 <p class="small dim">Table 1. The shipped task set. "Malicious" is the number of ground-truth events among the full corpus for that task.</p>
 
 <h2 id="s2"><span class="num">2</span>Difficulty profile</h2>
 <p>All results are for <code>gemini/gemini-3.5-flash</code> run through the terminus-2 scaffold, five trials per task. Reward is the F1 of the flagged event-id set against ground truth; because the signal is a small, exact set, a "pass" requires perfect identification (F1&nbsp;=&nbsp;1.0), so pass@1 and pass@3 are strict. Every task also passed its oracle check (reward 1.000) and no-op check (reward 0.000), confirming each is solvable and not satisfiable by inaction.</p>
 
 <table><thead><tr><th>Task</th><th>Tactic</th><th class="m">pass@1</th><th class="m">pass@3</th><th class="m">mean F1</th><th class="m">max F1</th></tr></thead>
-<tbody><tr><td>discovery-account-enum-hunt</td><td>Discovery</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.021</td><td class='m'>0.024</td></tr>
-<tr><td>persistence-run-key-hunt</td><td>Persistence</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.069</td><td class='m'>0.069</td></tr>
-<tr><td>defense-evasion-injection-hunt</td><td>Defense evasion</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.106</td><td class='m'>0.300</td></tr>
-<tr><td>threat-hunt-windows-eventlogs</td><td>Credential access + C2</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.132</td><td class='m'>0.602</td></tr>
-<tr><td>execution-vbs-launcher-hunt</td><td>Execution</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.144</td><td class='m'>0.615</td></tr>
-<tr><td>privesc-uac-bypass-hunt</td><td>Privilege escalation</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.164</td><td class='m'>0.400</td></tr>
-<tr><td>lateral-movement-psexec-hunt</td><td>Lateral movement</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.198</td><td class='m'>0.444</td></tr></tbody></table>
-<p class="small dim">Table 2. Per-task difficulty, ordered hardest-first by mean F1. Aggregate: pass@1 = pass@3 = 0.00, mean F1 = 0.119 across 35 trials.</p>
+<tbody><tr><td>run-key-hunt</td><td>Persistence</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.068</td><td class='m'>0.074</td></tr>
+<tr><td>credential-dump-hunt</td><td>Credential access + C2</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.069</td><td class='m'>0.283</td></tr>
+<tr><td>account-enumeration-hunt</td><td>Discovery</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.079</td><td class='m'>0.323</td></tr>
+<tr><td>lolbin-injection-hunt</td><td>Defense evasion</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.104</td><td class='m'>0.300</td></tr>
+<tr><td>psexec-lateral-hunt</td><td>Lateral movement</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.227</td><td class='m'>0.333</td></tr>
+<tr><td>vbs-launcher-hunt</td><td>Execution</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.230</td><td class='m'>0.435</td></tr>
+<tr><td>uac-bypass-hunt</td><td>Privilege escalation</td><td class='m'>0.00</td><td class='m'>0.00</td><td class='m'>0.266</td><td class='m'>0.389</td></tr></tbody></table>
+<p class="small dim">Table 2. Per-task difficulty, ordered hardest-first by mean F1. Aggregate: pass@1 = pass@3 = 0.00, mean F1 = 0.149 across 35 trials.</p>
 
 <p>The headline number — 0% pass@3 everywhere — understates what is happening, because F1 is fractional and the trials are not uniform. Figure&nbsp;1 places the suite in context against the six hand-authored synthetic tasks that preceded it (<a href="#sa">§A</a>): those were solved at 93–100% pass@3, whereas every real-telemetry task sits at zero. This gap is the central empirical result of the project.</p>
 
@@ -204,7 +204,7 @@ ul.tight li{margin:6px 0;}
 <rect x="300" y="206" width="470.0" height="20" fill="#666666"/>
 <text x="776.0" y="220.0" font-size="10" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">100%</text>
 <text x="28.0" y="246.0" font-size="10" fill="#0A0A0A" text-anchor="start" font-weight="600" font-family="Space Grotesk, sans-serif">REAL OTRF TELEMETRY — shipped</text>
-<text x="290.0" y="270.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">threat-hunt (cred access)</text>
+<text x="290.0" y="270.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">credential-access</text>
 <rect x="300" y="256" width="3" height="20" fill="#0A0A0A"/>
 <text x="310.0" y="270.0" font-size="10" fill="#0A0A0A" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">0%</text>
 <text x="290.0" y="302.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">lateral-movement</text>
@@ -262,46 +262,46 @@ ul.tight li{margin:6px 0;}
 <rect x="710.5" y="407.5" width="109.5" height="42.5" fill="#0A0A0A" opacity="0.05"/>
 <text x="717.8" y="437.8" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">precision-collapse cluster (22 trials)</text>
 <circle cx="805.4" cy="450.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="811.2" cy="138.7" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="817.1" cy="442.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="446.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="811.2" cy="438.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="817.1" cy="442.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="335.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
 <circle cx="820.0" cy="450.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="245.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="334.4" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="447.7" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="805.4" cy="333.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="811.2" cy="355.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="817.1" cy="303.9" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="814.2" cy="431.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="418.4" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="420.9" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="422.8" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="805.4" cy="429.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<rect x="361.3" y="434.4" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
+<rect x="282.9" y="440.9" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
+<rect x="340.8" y="442.8" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
+<rect x="346.7" y="246.0" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
+<rect x="352.5" y="432.5" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
+<circle cx="820.0" cy="322.9" r="4.2" fill="#0A0A0A" opacity="0.62"/>
 <circle cx="820.0" cy="450.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="622.9" cy="323.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="811.2" cy="347.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="817.1" cy="443.6" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="814.2" cy="430.9" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="416.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="420.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="424.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="805.4" cy="428.7" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<rect x="361.2" y="433.2" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
-<rect x="334.9" y="438.9" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
-<rect x="340.8" y="441.7" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
-<rect x="346.6" y="446.0" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
-<rect x="352.4" y="432.5" width="8" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.3"/>
-<circle cx="820.0" cy="450.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="450.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="440.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="662.3" cy="93.3" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="814.2" cy="423.8" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="811.2" cy="435.8" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="817.1" cy="323.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="387.6" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="449.3" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="433.7" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="435.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="805.4" cy="279.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="602.5" cy="280.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="817.1" cy="437.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
-<circle cx="820.0" cy="447.9" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="440.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="808.3" cy="279.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="814.2" cy="255.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="811.2" cy="436.7" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="817.1" cy="401.6" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="444.1" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="435.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="316.3" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="318.0" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="805.4" cy="285.2" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="811.2" cy="438.8" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="817.1" cy="355.5" r="4.2" fill="#0A0A0A" opacity="0.62"/>
+<circle cx="820.0" cy="278.8" r="4.2" fill="#0A0A0A" opacity="0.62"/>
 <line x1="360.6" y1="442.2" x2="500.6" y2="402.2" stroke="#666666" stroke-width="0.7"/>
 <text x="504.6" y="402.2" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">discovery (□): recall 0.36 —</text>
 <text x="504.6" y="413.2" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">misses the cross-source half</text>
 </svg><figcaption><b>Figure 2.</b> Precision versus recall for all 35 trials (circles; discovery shown as squares). The dense high-recall / near-zero-precision cluster is the dominant failure mode — "precision collapse." Discovery is the exception: it also loses recall (0.36), because the model catches one log source's evidence and misses the correlated events in another.</figcaption></figure>
 
-<p>Figure&nbsp;3 breaks the same data out per task as a distribution of trial F1 scores. Two things are visible. First, the spread is genuine and often bimodal — most trials near zero with an occasional partial hit (execution reaches 0.615, threat-hunt 0.602, privilege-escalation 0.400) — which is the signature of real difficulty rather than a broken verifier, since a task-design bug would produce uniform zeros. Second, no trial on any task comes close to the 1.0 line required to pass.</p>
+<p>Figure&nbsp;3 breaks the same data out per task as a distribution of trial F1 scores. Two things are visible. First, the spread is genuine and often bimodal — most trials near zero with an occasional partial hit (execution reaches 0.435, privilege-escalation 0.389, credential-dump 0.284) — which is the signature of real difficulty rather than a broken verifier, since a task-design bug would produce uniform zeros. Second, no trial on any task comes close to the 1.0 line required to pass.</p>
 
 <figure><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 376" width="100%" font-family="IBM Plex Mono, monospace"><rect width="860" height="376" fill="#FFFFFF"/>
 <text x="28.0" y="34.0" font-size="16" fill="#0A0A0A" text-anchor="start" font-weight="600" font-family="Space Grotesk, sans-serif">Per-task F1 distribution (5 trials each)</text>
@@ -318,77 +318,77 @@ ul.tight li{margin:6px 0;}
 <text x="740.0" y="80.0" font-size="9" fill="#666666" text-anchor="middle" font-weight="normal" font-family="IBM Plex Mono, monospace">1.00</text>
 <line x1="740.0" y1="86" x2="740.0" y2="330" stroke="#0A0A0A" stroke-width="1"/>
 <text x="740.0" y="68.0" font-size="9" fill="#0A0A0A" text-anchor="middle" font-weight="600" font-family="Space Grotesk, sans-serif">pass = 1.0</text>
-<text x="198.0" y="106.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">threat-hunt (cred access)</text>
+<text x="198.0" y="106.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">credential-access</text>
 <text x="198.0" y="118.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">credential access + c2</text>
-<line x1="217.9" y1="109.0" x2="529.1" y2="109.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="217.9" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="529.1" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="217.9" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="217.9" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="217.9" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="279.0" y="101.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="537.1" y="112.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.132</text>
+<line x1="218.0" y1="109.0" x2="360.3" y2="109.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="218.1" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="218.0" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="218.0" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="360.3" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="218.0" cy="109.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="245.3" y="101.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="368.3" y="112.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.069</text>
 <text x="198.0" y="140.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">lateral-movement</text>
 <text x="198.0" y="152.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">lateral movement</text>
-<line x1="213.2" y1="143.0" x2="445.3" y2="143.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="445.3" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="213.2" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="369.0" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="334.6" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="213.7" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="314.0" y="135.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="453.3" y="146.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.198</text>
+<line x1="216.5" y1="143.0" x2="386.6" y2="143.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="356.2" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="216.5" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="367.0" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="324.6" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="386.6" cy="143.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="329.0" y="135.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="394.6" y="146.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.227</text>
 <text x="198.0" y="174.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">persistence</text>
 <text x="198.0" y="186.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">persistence</text>
-<line x1="246.6" y1="177.0" x2="246.6" y2="177.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="246.6" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="246.6" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="246.6" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="246.6" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="246.6" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="245.4" y="169.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="254.6" y="180.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.069</text>
+<line x1="243.5" y1="177.0" x2="249.1" y2="177.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="246.5" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="243.5" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="245.9" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="249.1" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="246.5" cy="177.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="245.1" y="169.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="257.1" y="180.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.068</text>
 <text x="198.0" y="208.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">discovery</text>
 <text x="198.0" y="220.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">discovery</text>
-<line x1="220.6" y1="211.0" x2="222.7" y2="211.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="222.7" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<line x1="217.5" y1="211.0" x2="381.0" y2="211.0" stroke="#666666" stroke-width="0.8"/>
 <circle cx="220.6" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="222.2" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="220.6" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="220.6" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="220.1" y="203.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="230.7" y="214.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.021</text>
+<circle cx="217.5" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="220.8" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="381.0" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="220.4" cy="211.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="250.9" y="203.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="389.0" y="214.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.079</text>
 <text x="198.0" y="242.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">execution</text>
 <text x="198.0" y="254.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">execution</text>
-<line x1="214.8" y1="245.0" x2="536.0" y2="245.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="214.8" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="215.3" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="214.8" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="536.0" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="250.3" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="285.0" y="237.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="544.0" y="248.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.144</text>
+<line x1="214.5" y1="245.0" x2="440.4" y2="245.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="375.6" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="214.5" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="215.0" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="413.8" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="440.4" cy="245.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="330.7" y="237.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="448.4" y="248.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.230</text>
 <text x="198.0" y="276.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">defense-evasion</text>
 <text x="198.0" y="288.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">defense evasion</text>
-<line x1="220.1" y1="279.0" x2="369.0" y2="279.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="221.7" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<line x1="220.2" y1="279.0" x2="369.0" y2="279.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="220.2" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="274.9" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="221.9" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="240.3" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
 <circle cx="369.0" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="298.5" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="220.1" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="221.7" cy="279.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="265.0" y="271.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="377.0" y="282.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.106</text>
+<rect x="264.0" y="271.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="377.0" y="282.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.104</text>
 <text x="198.0" y="310.0" font-size="11" fill="#0A0A0A" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">privilege-esc</text>
 <text x="198.0" y="322.0" font-size="8.5" fill="#666666" text-anchor="end" font-weight="normal" font-family="IBM Plex Mono, monospace">privilege escalation</text>
-<line x1="213.7" y1="313.0" x2="422.0" y2="313.0" stroke="#666666" stroke-width="0.8"/>
-<circle cx="234.9" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="422.0" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="392.9" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="222.2" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<circle cx="213.7" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
-<rect x="295.9" y="305.0" width="2.4" height="16" fill="#0A0A0A"/>
-<text x="430.0" y="316.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.164</text>
-</svg><figcaption><b>Figure 3.</b> Per-task F1 across five trials each (dots), with the per-task mean (vertical bar) and min–max range (grey line). The right edge marks the F1 = 1.0 pass threshold; nothing approaches it. Persistence is perfectly consistent (all five trials identical at 0.069), a deterministic over-flagging strategy; the others vary trial to trial.</figcaption></figure>
+<line x1="214.0" y1="313.0" x2="416.1" y2="313.0" stroke="#666666" stroke-width="0.8"/>
+<circle cx="378.6" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="416.1" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="214.0" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="329.7" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<circle cx="416.1" cy="313.0" r="3.4" fill="#0A0A0A" opacity="0.55"/>
+<rect x="349.7" y="305.0" width="2.4" height="16" fill="#0A0A0A"/>
+<text x="424.1" y="316.0" font-size="9" fill="#666666" text-anchor="start" font-weight="normal" font-family="IBM Plex Mono, monospace">mean 0.266</text>
+</svg><figcaption><b>Figure 3.</b> Per-task F1 across five trials each (dots), with the per-task mean (vertical bar) and min–max range (grey line). The right edge marks the F1 = 1.0 pass threshold; nothing approaches it. Persistence is the most consistent task (all five trials cluster tightly at F1 ≈ 0.07), a near-deterministic over-flagging strategy; the others vary more.</figcaption></figure>
 
 <h3>2.2 What kinds of failure dominate</h3>
 <p>Quantitatively, the dominant failure is <b>precision collapse</b>: the model correctly identifies the malicious events but cannot separate them from benign context, so precision — and therefore F1 — is destroyed. A secondary mode, isolated to the discovery task, is a <b>cross-source recall gap</b>: the model finds the reconnaissance commands in Sysmon but never correlates them with the corresponding Windows Security membership-enumeration events, capping recall at 0.36. Both are diagnosed against real trajectories in §5.</p>
@@ -417,11 +417,11 @@ ul.tight li{margin:6px 0;}
 <p>Every failure below is genuine task difficulty rather than a task-design artifact. The argument is the same in each case and is grounded in the data of Figure&nbsp;2: on the identical inputs the oracle recovers the exact set (F1 = 1.0), the no-op agent scores 0, and the model's own recall and precision vary meaningfully across trials — an ambiguous instruction, broken environment, or over-strict verifier would instead produce uniform zeros. Trajectories are under <code>logs/pilots/</code>.</p>
 
 <h3>5.1 Precision collapse (persistence, lateral movement, and most trials)</h3>
-<p>On <b>persistence-run-key-hunt</b>, all five trials flagged exactly 309 events and captured all 11 malicious ones: recall 1.0, precision 0.036, F1 0.069. The model correctly found the Run-key persistence value and the beaconing process, then failed to stop — sweeping in benign registry and network events around them. <b>lateral-movement-psexec-hunt</b> shows the same at the extreme: one trial flagged 1,247 events to capture its 4 (F1 0.006). The model knows <i>where</i> the intrusion is; it cannot delimit it. This is the modal outcome across the suite (22 of 35 trials sit in the precision-collapse cluster of Figure&nbsp;2).</p>
+<p>On <b>run-key-hunt</b>, all five trials flagged ~290–340 events and captured all 11 malicious ones: recall 1.0, precision ≈ 0.036, F1 ≈ 0.069. The model correctly found the Run-key persistence value and the beaconing process, then failed to stop — sweeping in benign registry and network events around them. <b>psexec-lateral-hunt</b> shows the same at the extreme: every one of its five trials recovered all 4 malicious events (recall 1.0), but one flagged 644 events to do so (F1 0.012). The model knows <i>where</i> the intrusion is; it cannot delimit it. This is the modal outcome across the suite (17 of 35 trials sit in the precision-collapse cluster of Figure&nbsp;2).</p>
 <h3>5.2 Cross-source recall gap (discovery)</h3>
-<p><b>discovery-account-enum-hunt</b> is the one task where recall itself fails: every trial flagged 400–500 events but recovered only 5 of 14 malicious (recall 0.36, F1 ≈ 0.02). The model identified the <code>net.exe</code> reconnaissance commands in Sysmon but never connected them to the Windows Security 4798/4799 group-membership-enumeration events that record the same behaviour in a different log — so it missed the correlated half of the answer while still over-flagging. The task was designed to require exactly this Sysmon↔Security correlation, and the model did not perform it.</p>
+<p><b>account-enumeration-hunt</b> is the one task where recall itself fails: every one of the five trials recovered only 5 of 14 malicious (recall 0.36). Four of the five also over-flagged massively (400–500 events, F1 ≈ 0.02); the fifth kept precision far tighter (17 events flagged) yet, with the same recall gap, still reached only F1 0.32. In every case the model identified the <code>net.exe</code> reconnaissance commands in Sysmon but never connected them to the Windows Security 4798/4799 group-membership-enumeration events that record the same behaviour in a different log — so it missed the correlated half of the answer. The task was designed to require exactly this Sysmon↔Security correlation, and the model did not perform it.</p>
 <h3>5.3 Partial chains and the occasional near-hit</h3>
-<p>A minority of trials get partway. <b>lateral-movement</b> trial 3 flagged 16 events for 3 of 4 malicious (F1 0.30) — it reconstructed most of the Security+System+Sysmon service-execution chain but dropped one facet. <b>execution</b> trial 4 (F1 0.615) and <b>threat-hunt</b> trial 2 (F1 0.602, 86 events flagged for 37) are the best results in the entire run, and still fall far short of a pass. These near-hits confirm the tasks are calibrated at the model's frontier rather than beyond it: the capability is present but unreliable, which is precisely the regime a training-signal eval should target.</p>
+<p>A minority of trials get partway. <b>psexec-lateral</b>'s best trial reconstructed the full Security+System+Sysmon service-execution chain (all 4 events, recall 1.0) and kept its flag set to 20 events (F1 0.33) — a near-hit lost only to residual over-flagging. <b>credential-dump</b>, the largest task, recovered all 37 malicious events in every trial (recall 1.0) but even its tightest trial flagged 224 (F1 0.284). <b>execution</b> is the sharpest illustration of the precision problem and the strongest single result in the run: all five of its trials recovered the full 5-event process tree (recall 1.0), yet flagged anywhere from 18 to 1,183 events to do so — its best trial (18 events, F1 0.435) still falls far short of a pass purely on precision. These near-hits confirm the tasks are calibrated at the model's frontier rather than beyond it: the capability is present but unreliable, which is precisely the regime a training-signal eval should target.</p>
 
 <h2 id="sa"><span class="num">A</span>Appendix: how the eval was built</h2>
 <p>The brief notes that the curation process is itself signal, so we record it plainly. The first six tasks were <b>hand-authored synthetic generators</b>: an auth-log lateral-movement hunt, a CloudTrail privilege-escalation hunt, a Sigma-authoring task, a web-shell log-plus-diff correlation, and two execution-based vulnerability-repair tasks. Every one was solved by gemini-3.5-flash at 93–100% pass@3 (Figure&nbsp;1), and two apparent "0%" results turned out to be scoring artifacts — a CloudTrail ground-truth label that was itself incorrect, and a web-shell answer penalised on a count threshold for a defensible inclusion — not genuine difficulty. Those tasks are retained under <code>cut_synthetic/</code> for transparency.</p>

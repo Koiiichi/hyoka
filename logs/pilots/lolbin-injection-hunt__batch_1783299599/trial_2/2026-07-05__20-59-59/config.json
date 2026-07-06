@@ -1,0 +1,16 @@
+{
+    "job_name": "2026-07-05__20-59-59",
+    "jobs_dir": "jobs/batch_1783299599/trial_2",
+    "quiet": true,
+    "agents": [
+        {
+            "name": "terminus-2",
+            "model_name": "gemini/gemini-3.5-flash"
+        }
+    ],
+    "tasks": [
+        {
+            "path": "samples/lolbin-injection-hunt"
+        }
+    ]
+}
