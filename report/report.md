@@ -24,5 +24,5 @@ Regenerate with: `python3 report/build_report.py` (reads the pilot data;
 figures are computed, not hand-drawn).
 
 Supporting artefacts: `figures/` (CSV + standalone SVG), `analyze_results.py`
-(pass@k computation), `../logs/pilots/` (raw trials), `../cut_synthetic/` (the
+(pass@k computation), `../logs/pilots/` (raw trials), `../discarded/` (the
 hand-authored tasks the model solved, retained for transparency).
